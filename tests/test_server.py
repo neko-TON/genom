@@ -312,8 +312,8 @@ class TestTreasuryGov(unittest.TestCase):
 
     def test_breaker_freezes_and_vote_unfreezes(self):
         self.to_epoch(10)
-        for a in server.WHITELIST:            # market crash: −40% across the board
-            self.sim.prices[a] *= 0.60
+        for a in server.WHITELIST:            # market crash: −60% across the board
+            self.sim.prices[a] *= 0.40
         self.sim.force_close()
         self.assertTrue(self.sim.frozen)
         w = self.sim.weights_bps()
@@ -336,7 +336,7 @@ class TestTreasuryGov(unittest.TestCase):
     def test_frozen_agent_cancels_epochs(self):
         self.to_epoch(10)
         for a in server.WHITELIST:
-            self.sim.prices[a] *= 0.60
+            self.sim.prices[a] *= 0.40
         self.sim.force_close()
         self.sim.force_close()
         rec = self.sim.epochs[-1]
