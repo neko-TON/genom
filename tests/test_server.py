@@ -287,5 +287,63 @@ class TestAgent(unittest.TestCase):
         self.assertLessEqual(len(self.sim.shadow_uv), len(self.sim.uv))
 
 
+class TestTreasuryGov(unittest.TestCase):
+    def setUp(self):
+        self.sim = server.Sim(seed=5)
+
+    def to_epoch(self, n):
+        # advance real sim time (not force_close) so trading volume accrues
+        # and the treasury actually receives tax inflows
+        while self.sim.epoch < n:
+            self.sim.advance(server.EPOCH_SIM)
+
+    def test_treasury_snapshot(self):
+        self.to_epoch(4)
+        t = self.sim.snapshot()["treasury"]
+        self.assertGreater(t["usdg"], 0)
+        self.assertGreater(t["epoch_cost"], 0)
+        self.assertGreater(t["inflow_tax"], 0)
+        self.assertAlmostEqual(t["runway_days"], t["usdg"] / t["epoch_cost"], places=3)
+
+    def test_guard_limits_follow_phase(self):
+        self.to_epoch(10)
+        g = self.sim.snapshot()["guard"]
+        self.assertEqual(g["limits"], {"max_weight_bps": 2000, "turnover_bps": 700})
+
+    def test_breaker_freezes_and_vote_unfreezes(self):
+        self.to_epoch(10)
+        for a in server.WHITELIST:            # market crash: −40% across the board
+            self.sim.prices[a] *= 0.60
+        self.sim.force_close()
+        self.assertTrue(self.sim.frozen)
+        w = self.sim.weights_bps()
+        self.assertGreater(w["USDG"], 9500)   # basket parked in cash
+        self.assertTrue(self.sim.gov("unfreeze"))
+        self.assertFalse(self.sim.gov("unfreeze"))          # no duplicate votes
+        eta = self.sim.gov_queue[0]["eta"]
+        self.assertEqual(eta, self.sim.epoch + 3)
+        self.to_epoch(eta)
+        self.assertFalse(self.sim.frozen)
+        self.assertEqual(self.sim.gov_queue, [])
+
+    def test_phase3_vote(self):
+        self.assertFalse(self.sim.gov("phase3"))            # not in phase 2 yet
+        self.to_epoch(10)
+        self.assertTrue(self.sim.gov("phase3"))
+        self.to_epoch(self.sim.gov_queue[0]["eta"])
+        self.assertEqual(self.sim.phase, 3)
+
+    def test_frozen_agent_cancels_epochs(self):
+        self.to_epoch(10)
+        for a in server.WHITELIST:
+            self.sim.prices[a] *= 0.60
+        self.sim.force_close()
+        self.sim.force_close()
+        rec = self.sim.epochs[-1]
+        self.assertIsNotNone(rec["cancelled"])
+        status = next(c for c in rec["checks"] if c["name"] == "agent status")
+        self.assertFalse(status["ok"])
+
+
 if __name__ == "__main__":
     unittest.main()

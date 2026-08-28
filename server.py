@@ -174,6 +174,10 @@ class Sim:
         self._tre_inflow_tax = 0.0
         self._tre_inflow_creator = 0.0
         self._tre_protocol = 0.0
+        self.treasury_usdg = 2400.0
+        self.epoch_cost = 120.0
+        self.protocol_fund = 0.0
+        self.freeze_epoch = 0
         # __init__ additions (Task 5)
         self._pending_commit = None      # {"epoch","weights","thesis","nonce","hash","committed_at"}
         self._force_bad_next = False
@@ -338,6 +342,31 @@ class Sim:
         if self.phase >= 1 or self.epoch >= 2:   # first proposal at close of epoch 2
             self._agent_cycle()
         self._update_shadow()
+        self.epoch_cost = 120.0 * self.rng.uniform(0.85, 1.20)
+        self.treasury_usdg += self._tre_inflow_tax + self._tre_inflow_creator
+        self.treasury_usdg = max(0.0, self.treasury_usdg - self.epoch_cost)
+        was_hold = self.hold_mode
+        self.hold_mode = (self.treasury_usdg / self.epoch_cost) < 14.0
+        if self.hold_mode and not was_hold:
+            self.log("runway under 14 days — hold mode: one rebalance per 3 epochs")
+        if not self.frozen and len(self.uv) >= 2:
+            peak = max(self.uv[-7:])
+            if self.uv[-1] <= 0.75 * peak:
+                self.frozen = True
+                self.freeze_epoch = self.epoch
+                nav = self.nav()
+                self.positions = {a: 0.0 for a in WHITELIST}
+                self.positions[CASH] = nav
+                self.log("BREAKER: drawdown ≤ −25%% over 7 epochs — frozen, "
+                         "basket parked in USDG")
+        for g in [g for g in self.gov_queue if g["eta"] <= self.epoch + 1]:
+            self.gov_queue.remove(g)
+            if g["action"] == "phase3":
+                self.phase = 3
+                self.log("governance: phase 3 unlocked — full mandate")
+            elif g["action"] == "unfreeze":
+                self.frozen = False
+                self.log("governance: agent unfrozen by holder vote")
 
     def _reveal_pending(self):
         if not self._pending_commit or self._pending_commit["epoch"] != self.epoch:
@@ -491,6 +520,20 @@ class Sim:
                  % (len(trades), max_imp, cost))
         return {"trades": trades, "max_impact_bps": max_imp, "cost": cost}
 
+    def gov(self, action):
+        if any(g["action"] == action for g in self.gov_queue):
+            return False
+        if action == "phase3" and self.phase == 2:
+            label = "Vote: unlock phase 3 (full mandate 35% / 20%)"
+        elif action == "unfreeze" and self.frozen:
+            label = "Vote: unfreeze the agent"
+        else:
+            return False
+        self.gov_queue.append({"label": label, "action": action,
+                               "eta": self.epoch + 3})
+        self.log("governance vote queued: %s — timelock 3 epochs" % action)
+        return True
+
     def _update_shadow(self):
         if self.phase < 1:
             return
@@ -526,11 +569,18 @@ class Sim:
                                            "last_share", "claimable_value",
                                            "claimed_value")}
                         for h in self.holders],
-            "treasury": {"runway_days": 0.0, "usdg": 0.0,
-                                        "epoch_cost": 0.0, "inflow_tax": 0.0,
-                                        "inflow_creator": 0.0, "protocol_fund": 0.0,
-                                        "hold_mode": False},
-            "guard": {"frozen": self.frozen, "freeze_epoch": 0,
-                      "limits": {"max_weight_bps": 3500, "turnover_bps": 2000}},
+            "treasury": {
+                "runway_days": self.treasury_usdg / self.epoch_cost,
+                "usdg": self.treasury_usdg, "epoch_cost": self.epoch_cost,
+                "inflow_tax": self._tre_inflow_tax,
+                "inflow_creator": self._tre_inflow_creator,
+                "protocol_fund": self._tre_protocol,
+                "hold_mode": self.hold_mode,
+            },
+            "guard": {
+                "frozen": self.frozen, "freeze_epoch": self.freeze_epoch,
+                "limits": {"max_weight_bps": PHASE_LIMITS[self.phase][0],
+                           "turnover_bps": PHASE_LIMITS[self.phase][1]},
+            },
             "gov_queue": list(self.gov_queue), "log": list(self.log_items),
         }
