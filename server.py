@@ -10,6 +10,7 @@ import os
 import re
 import sys
 import math
+import ssl
 import time
 import threading
 import urllib.request
@@ -601,6 +602,22 @@ class RpcError(Exception):
     pass
 
 
+def _ssl_context():
+    ctx = ssl.create_default_context()
+    if ctx.cert_store_stats()["x509_ca"]:
+        return ctx
+    for cafile in ("/etc/ssl/cert.pem", "/etc/ssl/certs/ca-certificates.crt"):
+        if os.path.exists(cafile):
+            try:
+                return ssl.create_default_context(cafile=cafile)
+            except ssl.SSLError:
+                continue
+    return ctx
+
+
+_SSL_CTX = _ssl_context()
+
+
 def load_config():
     try:
         cfg = json.loads(CONFIG_PATH.read_text())
@@ -617,7 +634,7 @@ def rpc_call(url, method, params, timeout=4):
     req = urllib.request.Request(url, data=payload,
                                  headers={"Content-Type": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
+        with urllib.request.urlopen(req, timeout=timeout, context=_SSL_CTX) as r:
             out = json.loads(r.read())
     except (OSError, ValueError) as exc:
         raise RpcError("rpc unreachable: %s" % exc) from exc

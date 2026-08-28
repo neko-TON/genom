@@ -8,6 +8,7 @@
 import json
 import os
 import re
+import ssl
 import sys
 import urllib.request
 from pathlib import Path
@@ -18,12 +19,28 @@ DEFAULT_RPC = "https://rpc.mainnet.chain.robinhood.com"
 CHAIN_ID = 4663
 
 
+def _ssl_context():
+    ctx = ssl.create_default_context()
+    if ctx.cert_store_stats()["x509_ca"]:
+        return ctx
+    for cafile in ("/etc/ssl/cert.pem", "/etc/ssl/certs/ca-certificates.crt"):
+        if os.path.exists(cafile):
+            try:
+                return ssl.create_default_context(cafile=cafile)
+            except ssl.SSLError:
+                continue
+    return ctx
+
+
+_SSL_CTX = _ssl_context()
+
+
 def rpc(url, method, params):
     payload = json.dumps({"jsonrpc": "2.0", "id": 1,
                           "method": method, "params": params}).encode()
     req = urllib.request.Request(url, data=payload,
                                  headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=6) as r:
+    with urllib.request.urlopen(req, timeout=6, context=_SSL_CTX) as r:
         out = json.loads(r.read())
     if "error" in out:
         raise RuntimeError(out["error"])
