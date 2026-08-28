@@ -1,5 +1,6 @@
 import json
 import sys
+import threading
 import unittest
 from pathlib import Path
 
@@ -343,6 +344,98 @@ class TestTreasuryGov(unittest.TestCase):
         self.assertIsNotNone(rec["cancelled"])
         status = next(c for c in rec["checks"] if c["name"] == "agent status")
         self.assertFalse(status["ok"])
+
+
+import json as _json
+import urllib.request as _rq
+import urllib.error as _rqerr
+
+
+class TestHttp(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.srv = server.make_node(port=0, seed=3, config={"mode": "sim"})
+        cls.port = cls.srv.server_address[1]
+        threading.Thread(target=cls.srv.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.srv.shutdown()
+
+    def url(self, path):
+        return "http://127.0.0.1:%d%s" % (self.port, path)
+
+    def get(self, path):
+        with _rq.urlopen(self.url(path), timeout=5) as r:
+            return r.status, r.read(), dict(r.headers)
+
+    def post(self, path, body):
+        req = _rq.Request(self.url(path), data=_json.dumps(body).encode(),
+                          headers={"Content-Type": "application/json"})
+        with _rq.urlopen(req, timeout=5) as r:
+            return r.status, _json.loads(r.read())
+
+    def state(self):
+        return _json.loads(self.get("/api/state")[1])
+
+    def test_static_pages(self):
+        status, body, headers = self.get("/")
+        self.assertEqual(status, 200)
+        self.assertIn(b"NOSTRO", body)
+        self.assertIn("text/html", headers["Content-Type"])
+        self.assertEqual(self.get("/console.html")[0], 200)
+        self.assertEqual(self.get("/front.js")[0], 200)
+        self.assertEqual(self.get("/favicon.svg")[0], 200)
+
+    def test_404_and_traversal(self):
+        for path in ("/nope.html", "/../server.py", "/..%2fserver.py"):
+            with self.assertRaises(_rqerr.HTTPError) as ctx:
+                self.get(path)
+            self.assertEqual(ctx.exception.code, 404)
+
+    def test_state_contract(self):
+        for _ in range(10):
+            self.post("/api/control", {"action": "advance"})
+        s = self.state()
+        self.assertEqual(SIM_TOP_KEYS - set(s), set())
+        self.assertGreaterEqual(s["epoch"], 11)
+        self.assertTrue(s["track"])
+        self.assertTrue(s["log"])
+        self.assertTrue(any(e["checks"] for e in s["epochs"]))
+        you = next(h for h in s["holders"] if h["id"] == "you")
+        self.assertGreaterEqual(you["claimable_value"], 0)
+        self.assertIn("no-store", self.get("/api/state")[2]["Cache-Control"])
+
+    def test_control_pause_speed(self):
+        self.post("/api/control", {"action": "pause"})
+        self.assertTrue(self.state()["paused"])
+        self.post("/api/control", {"action": "resume"})
+        self.assertFalse(self.state()["paused"])
+        self.post("/api/control", {"action": "speed", "value": 15})
+        self.assertAlmostEqual(self.state()["speed"], 86400 / 15)
+
+    def test_trade_claim_gov(self):
+        before = next(h for h in self.state()["holders"] if h["id"] == "you")
+        self.post("/api/trade", {"side": "buy", "amount": 50_000})
+        after = next(h for h in self.state()["holders"] if h["id"] == "you")
+        self.assertAlmostEqual(after["balance"], before["balance"] + 50_000)
+        self.assertEqual(self.post("/api/claim", {})[1]["ok"], True)
+        self.post("/api/gov", {"action": "phase3"})   # ok regardless of phase
+
+    def test_bad_requests(self):
+        for path, body in [("/api/control", {"action": "explode"}),
+                           ("/api/trade", {"side": "buy", "amount": -5}),
+                           ("/api/gov", {})]:
+            req = _rq.Request(self.url(path), data=_json.dumps(body).encode(),
+                              headers={"Content-Type": "application/json"})
+            with self.assertRaises(_rqerr.HTTPError) as ctx:
+                _rq.urlopen(req, timeout=5)
+            self.assertEqual(ctx.exception.code, 400)
+        req = _rq.Request(self.url("/api/trade"), data=b"{not json",
+                          headers={"Content-Type": "application/json"})
+        with self.assertRaises(_rqerr.HTTPError) as ctx:
+            _rq.urlopen(req, timeout=5)
+        self.assertEqual(ctx.exception.code, 400)
 
 
 if __name__ == "__main__":

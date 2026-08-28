@@ -584,3 +584,159 @@ class Sim:
             },
             "gov_queue": list(self.gov_queue), "log": list(self.log_items),
         }
+
+
+# ==== http ======================================================
+
+ROOT = Path(__file__).resolve().parent
+CONTENT_TYPES = {".html": "text/html; charset=utf-8", ".css": "text/css",
+                 ".js": "application/javascript", ".svg": "image/svg+xml",
+                 ".jpg": "image/jpeg", ".json": "application/json",
+                 ".ico": "image/x-icon"}
+
+
+class NodeHandler(BaseHTTPRequestHandler):
+    server_version = "NostroNode/0.1"
+
+    def log_message(self, fmt, *args):
+        pass                                          # keep the console quiet
+
+    def _json(self, obj, code=200):
+        body = json.dumps(obj).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _bad(self, msg):
+        self._json({"ok": False, "error": msg}, 400)
+
+    def do_GET(self):
+        path = self.path.split("?", 1)[0]
+        if path == "/api/state":
+            srv = self.server
+            with srv.sim_lock:
+                state = srv.sim.snapshot()
+                state["public"] = srv.public
+            return self._json(state)
+        if path == "/api/claims":
+            return self._json({"distributor": None, "rounds": []})
+        self._static(path)
+
+    def _static(self, path):
+        name = "index.html" if path in ("", "/") else path.lstrip("/")
+        target = (ROOT / name)
+        try:
+            target = target.resolve()
+            target.relative_to(ROOT)
+        except (ValueError, OSError):
+            return self._json({"error": "not found"}, 404)
+        if not target.is_file() or target.suffix not in CONTENT_TYPES:
+            return self._json({"error": "not found"}, 404)
+        body = target.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", CONTENT_TYPES[target.suffix])
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_POST(self):
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            body = json.loads(self.rfile.read(length) or b"{}")
+            if not isinstance(body, dict):
+                raise ValueError
+        except (ValueError, json.JSONDecodeError):
+            return self._bad("bad json")
+        srv = self.server
+        with srv.sim_lock:
+            sim = srv.sim
+            if self.path == "/api/control":
+                action = body.get("action")
+                if action == "pause":
+                    sim.paused = True
+                elif action == "resume":
+                    sim.paused = False
+                elif action == "advance":
+                    sim.force_close()
+                elif action == "speed":
+                    try:
+                        per_epoch = float(body.get("value") or 0)
+                    except (TypeError, ValueError):
+                        return self._bad("bad speed")
+                    if not 5 <= per_epoch <= 3600:
+                        return self._bad("bad speed")
+                    sim.set_speed(EPOCH_SIM / per_epoch)
+                else:
+                    return self._bad("unknown action")
+                return self._json({"ok": True})
+            if self.path == "/api/trade":
+                side, amount = body.get("side"), body.get("amount")
+                if side not in ("buy", "sell") or not isinstance(amount, (int, float)) \
+                        or not amount > 0:
+                    return self._bad("bad trade")
+                sim.trade(side, amount)
+                return self._json({"ok": True})
+            if self.path == "/api/claim":
+                return self._json({"ok": True, "paid": sim.claim()})
+            if self.path == "/api/gov":
+                if body.get("action") not in ("phase3", "unfreeze"):
+                    return self._bad("unknown gov action")
+                return self._json({"ok": sim.gov(body["action"])})
+        self._bad("unknown endpoint")
+
+
+def make_node(port, seed=None, public=False, config=None):
+    # config override keeps tests hermetic: a developer's real nstro.json
+    # (gitignored, possibly in live mode) must never leak into the suite
+    srv = ThreadingHTTPServer(("127.0.0.1", port), NodeHandler)
+    srv.sim = Sim(seed=seed)
+    srv.sim_lock = threading.Lock()
+    srv.public = public
+    srv.config = config or {"mode": "sim"}   # Task 8 replaces the fallback with load_config()
+    return srv
+
+
+def start_ticker(srv):
+    def run():
+        last = time.monotonic()
+        while True:
+            time.sleep(0.25)
+            now = time.monotonic()
+            dt, last = now - last, now
+            try:
+                with srv.sim_lock:
+                    srv.sim.advance(dt * srv.sim.speed)
+            except Exception as exc:                       # sim must never die
+                print("sim tick error: %r" % exc, file=sys.stderr)
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
+    return t
+
+
+def main(argv=None):
+    import argparse
+    ap = argparse.ArgumentParser(description="Nostro node")
+    ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument("--seed", type=int, default=None)
+    ap.add_argument("--public", action="store_true")
+    args = ap.parse_args(argv)
+    try:
+        srv = make_node(args.port, seed=args.seed, public=args.public)
+    except OSError:
+        print("port %d is busy — pick another with --port" % args.port)
+        return 1
+    start_ticker(srv)
+    print("nostro node: http://localhost:%d  (Ctrl+C to stop)" % args.port)
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        print("\nbye")
+        srv.shutdown()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
