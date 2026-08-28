@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nostro Console — $NSTRO local node</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="top-brand">
+    <a href="index.html" class="brand-link" title="Overview">
+      <svg viewBox="0 0 284 274" fill="none" class="mark" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="17" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M12 112 L185.2 12 L271.8 62 L271.8 162 L98.6 262 L12 212 Z"/>
+          <path d="M12 112 L98.6 162 L98.6 262"/>
+          <path d="M98.6 162 L271.8 62"/>
+          <path d="M98.6 62 L185.2 112 L185.2 212"/>
+        </g>
+      </svg>
+      <span class="wordmark">NOSTRO<em>CONSOLE</em></span>
+    </a>
+    <span class="pill mono">$NSTRO</span>
+    <a href="index.html" class="navlink">overview</a>
+  </div>
+
+  <div class="top-stats mono" id="topStats"></div>
+
+  <button id="btnWallet" class="ctl ctl-ice mono" hidden>CONNECT WALLET</button>
+
+  <div class="top-ctl">
+    <button id="btnPause" class="ctl" title="Pause / resume">⏸</button>
+    <select id="selSpeed" class="ctl mono" title="Simulation speed">
+      <option value="15">epoch = 15s</option>
+      <option value="60" selected>epoch = 60s</option>
+      <option value="180">epoch = 180s</option>
+    </select>
+    <button id="btnAdvance" class="ctl ctl-ice" title="Close the epoch now">next epoch →</button>
+  </div>
+  <div class="epoch-line"><span id="epochProgress"></span></div>
+</header>
+
+<div id="alerts"></div>
+
+<main class="grid">
+  <section class="card col-12" id="cardLive" hidden>
+    <h2><span class="cn mono">on-chain</span> Connected contract <span class="mono lf-status ok" id="cfgStatus"></span></h2>
+    <div id="liveInfo"></div>
+    <p class="foot mono">configured from the terminal: ./nstro connect &lt;vault&gt; [rpc] · ./nstro sim</p>
+  </section>
+
+  <section class="card col-12" id="cardOnWallet" hidden>
+    <h2><span class="cn mono">your wallet</span> On-chain balance & claim</h2>
+    <div id="onWallet" class="mono"></div>
+  </section>
+
+  <section class="card col-12" id="cardActions" hidden>
+    <h2><span class="cn mono">actions</span> Do it on-chain — connected wallet signs</h2>
+    <div class="act-grid">
+      <div class="act-box">
+        <p class="act-t mono">TRADE ON THE CURVE</p>
+        <div class="act-row">
+          <input id="buyEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="ETH to spend">
+          <button class="act act-ice" id="btnBuy">buy with ETH</button>
+        </div>
+        <div class="act-row">
+          <input id="sellTok" class="amt mono" type="number" value="100000" step="10000" min="0" aria-label="tokens to sell">
+          <button class="act" id="btnSell">sell tokens</button>
+        </div>
+        <p class="act-hint mono">buy/sell run against the Pons bonding curve · 1% fee</p>
+      </div>
+      <div class="act-box">
+        <p class="act-t mono">FEED THE NOSTRO VAULT</p>
+        <div class="act-row">
+          <input id="feedEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="ETH to send">
+          <button class="act act-ice" id="btnFeed">send ETH fees</button>
+        </div>
+        <div class="act-row">
+          <button class="act" id="btnProcessWeth">process WETH → split</button>
+          <button class="act" id="btnBurn">burn stray token</button>
+        </div>
+        <p class="act-hint mono">ETH/WETH → 80/13/7 split · other tokens → burned to dead</p>
+      </div>
+    </div>
+    <p id="actStatus" class="mono act-status"></p>
+  </section>
+
+  <section class="card col-7" id="cardBasket">
+    <h2><span class="cn mono">NostroVault</span> Basket</h2>
+    <div id="basket"></div>
+    <p class="foot mono" id="basketFoot"></p>
+  </section>
+
+  <section class="card col-5" id="cardChart">
+    <h2><span class="cn mono">NAV</span> Unit value: actual vs shadow</h2>
+    <canvas id="chart" height="220"></canvas>
+    <div class="legend mono">
+      <span><i class="sw sw-fact"></i>actual (executed)</span>
+      <span><i class="sw sw-shadow"></i>agent shadow (no execution)</span>
+    </div>
+  </section>
+
+  <section class="card col-7" id="cardTrack">
+    <h2><span class="cn mono">CommitStore</span> Track record · hash lands before the swap · click an epoch for details</h2>
+    <div id="track"></div>
+  </section>
+
+  <section class="card col-5" id="cardWallet">
+    <h2><span class="cn mono">your wallet</span> Balance & claim</h2>
+    <div id="wallet"></div>
+    <div class="wallet-btns">
+      <input id="tradeAmt" class="amt mono" type="number" value="100000" min="0" step="10000" aria-label="Trade amount, $NSTRO">
+      <button class="act" data-trade="buy">buy</button>
+      <button class="act" data-trade="sell">sell</button>
+      <button class="act act-ice" id="btnClaim">claim</button>
+    </div>
+    <p class="foot">No claim schedule: whatever has accrued can be taken at any moment.</p>
+  </section>
+
+  <section class="card col-7" id="cardHolders">
+    <h2><span class="cn mono">weight × time</span> Holders</h2>
+    <div id="holders"></div>
+  </section>
+
+  <section class="card col-5" id="cardGuard">
+    <h2><span class="cn mono">MandateGuard</span> Latest vector check</h2>
+    <div id="guard"></div>
+  </section>
+
+  <section class="card col-4" id="cardTreasury">
+    <h2><span class="cn mono">AgentTreasury</span> Operations</h2>
+    <div id="treasury"></div>
+  </section>
+
+  <section class="card col-4" id="cardGov">
+    <h2><span class="cn mono">vote · 3-day timelock</span> Governance</h2>
+    <div id="gov"></div>
+  </section>
+
+  <section class="card col-4" id="cardLog">
+    <h2><span class="cn mono">events</span> Node log</h2>
+    <div id="log" class="mono"></div>
+  </section>
+</main>
+
+<footer class="bottom mono">
+  Nostro Agent · local full-cycle simulation of concept v0.1 · genuine keccak256 + abi.encode ·
+  Robinhood Chain / Pons V2 / Uniswap V4 are emulated by this node
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

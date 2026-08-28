@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nostro Agent — $NSTRO</title>
+<meta name="description" content="An index token. A 3% trading tax buys tokenized stocks into a shared basket. An autonomous agent sets the weights; a contract enforces the mandate; every decision is hash-committed before execution.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="front.css">
+</head>
+<body>
+
+<div class="pagebg" aria-hidden="true">
+  <img src="brand-banner.jpg" alt="" class="pg-banner">
+  <canvas id="wave"></canvas>
+  <div class="pg-vig"></div>
+</div>
+
+<header class="hd">
+  <a class="hd-brand" href="index.html">
+    <svg viewBox="0 0 284 274" fill="none" class="hd-mark" aria-hidden="true">
+      <g stroke="currentColor" stroke-width="19" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M12 112 L185.2 12 L271.8 62 L271.8 162 L98.6 262 L12 212 Z"/>
+        <path d="M12 112 L98.6 162 L98.6 262"/>
+        <path d="M98.6 162 L271.8 62"/>
+        <path d="M98.6 62 L185.2 112 L185.2 212"/>
+      </g>
+    </svg>
+    <span class="mono">NOSTRO&nbsp;AGENT</span>
+  </a>
+  <nav class="hd-nav mono">
+    <a href="index.html#how">MECHANICS</a>
+    <a href="index.html#proof">PROOF</a>
+    <a href="index.html#rollout">ROLLOUT</a>
+  </nav>
+  <a class="hd-console mono" href="console.html">OPEN CONSOLE ↗</a>
+</header>
+
+<main>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <svg viewBox="0 0 284 274" fill="none" class="hero-ghost" aria-hidden="true">
+    <g stroke="currentColor" stroke-width="6" stroke-linejoin="round">
+      <path d="M12 112 L185.2 12 L271.8 62 L271.8 162 L98.6 262 L12 212 Z"/>
+      <path d="M12 112 L98.6 162 L98.6 262"/>
+      <path d="M98.6 162 L271.8 62"/>
+      <path d="M98.6 62 L185.2 112 L185.2 212"/>
+    </g>
+  </svg>
+
+  <div class="hero-in">
+    <p class="mono hero-kicker rv">
+      <span class="kick-badge">LAUNCHING ON PONS V2</span>
+      $NSTRO — AN INDEX TOKEN THAT RUNS ITSELF, INSIDE HARD LIMITS
+    </p>
+    <h1 class="rv d1">
+      <span>YOUR CAPITAL.</span>
+      <span>THE AGENT'S DECISIONS.</span>
+      <span class="hl">THE CONTRACT'S LIMITS.</span>
+    </h1>
+    <div class="hero-foot rv d2">
+      <p class="hero-sub">
+        A 3% tax on every trade keeps buying tokenized stocks into a shared basket.
+        An autonomous agent sets the weights. MandateGuard rejects anything outside
+        the mandate. The agent's key can propose — it can never withdraw.
+      </p>
+      <div class="hero-act">
+        <a class="btn mono" href="console.html">OPEN THE LIVE CONSOLE&nbsp;→</a>
+        <a class="lnk mono" href="index.html#how">how it works ↓</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip mono rv d3" id="dataStrip" aria-live="off">
+    <span class="sim-only">EPOCH <b id="stEpoch">——</b></span>
+    <span class="sim-only">NAV <b id="stNav">——</b> USDG</span>
+    <span class="sim-only">UNIT <b id="stUnit">——</b></span>
+    <span class="sim-only">RUNWAY <b id="stRun">——</b>D</span>
+    <span class="sim-only">PHASE <b id="stPhase">—</b></span>
+    <span class="live-only" id="stLive" hidden></span>
+    <span class="strip-state" id="stState">CONNECTING<span class="cursor">▌</span></span>
+  </div>
+  <div class="tape" aria-hidden="true"><div class="tape-track" id="tape"></div></div>
+</section>
+
+<!-- ================= MECHANICS ================= -->
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="mono sec-idx">01</span>
+      <h2>WHAT HAPPENS<br>EVERY 24 HOURS</h2>
+    </div>
+    <ol class="ledger">
+      <li class="rv">
+        <span class="mono no">00</span>
+        <div><h3>Launched on Pons V2, Robinhood Chain</h3>
+          <p>$NSTRO starts on the Pons bonding curve and graduates into a Uniswap v4 pool
+            with permanently locked liquidity. Trading fees are charged by the launchpad
+            in ETH and routed straight into the contracts below — nothing is manual.</p></div>
+        <span class="mono kpi">pons v2</span>
+      </li>
+      <li class="rv">
+        <span class="mono no">01</span>
+        <div><h3>Every trade pays 3%</h3>
+          <p>80% buys the holders' basket, 13% funds the agent's operations, 7% goes to the protocol. Creator fees add 1% in USDG. Nobody has to do anything — the flow never stops.</p></div>
+        <span class="mono kpi">80 / 13 / 7</span>
+      </li>
+      <li class="rv">
+        <span class="mono no">02</span>
+        <div><h3>Shares accrue by balance × time</h3>
+          <p>Not by snapshot. A bot entering one block before the close earns nothing. Claim whenever you want — there is no distribution schedule to snipe.</p></div>
+        <span class="mono kpi">bal × t</span>
+      </li>
+      <li class="rv">
+        <span class="mono no">03</span>
+        <div><h3>The decision is sealed before the trade</h3>
+          <p>The agent publishes keccak256(epoch, weights, thesis, nonce) before anything moves. Reasoning goes on record first, outcome comes second — never the other way around.</p></div>
+        <span class="mono kpi">keccak256</span>
+      </li>
+      <li class="rv">
+        <span class="mono no">04</span>
+        <div><h3>The contract checks the vector</h3>
+          <p>Whitelist only. Weight ≤ 35%. Position ≥ 5%. Turnover ≤ 20% NAV. One rebalance per epoch. Cash 0–100%. Any failure cancels the epoch and the basket stays put.</p></div>
+        <span class="mono kpi">8 checks</span>
+      </li>
+      <li class="rv">
+        <span class="mono no">05</span>
+        <div><h3>Execution is one batch</h3>
+          <p>Swaps go through Uniswap V4 pools together. Slippage over the limit reverts everything — no partial fills, no surprises.</p></div>
+        <span class="mono kpi">1 batch</span>
+      </li>
+      <li class="rv">
+        <span class="mono no">06</span>
+        <div><h3>The thesis is revealed and re-hashed</h3>
+          <p>Next epoch, the text is opened and verified against the sealed hash. A mismatch marks the epoch failed — publicly, forever. The track record cannot be rewritten.</p></div>
+        <span class="mono kpi">N + 1</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= PROOF ================= -->
+<section class="sec" id="proof">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="mono sec-idx">02</span>
+      <h2>THIS NODE IS RUNNING<br>THE WHOLE THING NOW</h2>
+    </div>
+    <div class="proof rv d1">
+      <div class="term mono">
+        <div class="term-hd"><span>COMMITSTORE</span><span>LATEST SEALED DECISION</span></div>
+        <div class="term-bd">
+          <p class="dim">commit = keccak256(abi.encode(epoch, weights, thesisText, nonce))</p>
+          <p>epoch <span class="ice" id="cEpoch">—</span> <span class="dim">/ submitted before execution</span></p>
+          <p class="hashline" id="cHash">0x————————————————————————————————————————————————————————————————</p>
+          <p class="dim" id="cStatus">connecting to node<span class="cursor">▌</span></p>
+        </div>
+      </div>
+      <div class="proof-side">
+        <p>The console shows the basket rebalancing, the guard rejecting bad vectors,
+          the sniper bot earning nothing, the breaker, the votes — and your own wallet
+          trading and claiming against it.</p>
+        <div class="mini mono" id="miniBasket"></div>
+        <a class="btn mono" href="console.html">OPEN THE CONSOLE&nbsp;→</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WORST CASE ================= -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="mono sec-idx">03</span>
+      <h2>THE DOWNSIDE IS ENGINEERED,<br>NOT PROMISED</h2>
+    </div>
+    <div class="worst">
+      <div class="w-col rv">
+        <span class="mono no">A</span>
+        <h3>The agent breaks</h3>
+        <p>Worst case: whitelisted stocks in bad proportions, at most a fifth of NAV turned over per day. Withdrawing assets is not a function its key has.</p>
+      </div>
+      <div class="w-col rv">
+        <span class="mono no">B</span>
+        <h3>Drawdown hits −25% in 7 epochs</h3>
+        <p>The breaker freezes the agent and parks the basket in USDG. Only a holder vote with a 3-day timelock switches it back on.</p>
+      </div>
+      <div class="w-col rv">
+        <span class="mono no">C</span>
+        <h3>Holders stop trusting it</h3>
+        <p>Limits, whitelist, the agent itself — all replaceable by vote. Three days of timelock give dissenters time to exit first.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ROLLOUT ================= -->
+<section class="sec" id="rollout">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="mono sec-idx">04</span>
+      <h2>TRUST IS EARNED<br>IN PUBLIC</h2>
+    </div>
+    <ol class="ph rv d1">
+      <li data-ph="0"><span class="mono no">P0</span><div><h3>Passive index</h3><p>Static weights. Accrual and claims running, agent off.</p></div><span class="mono cur">● CURRENT</span></li>
+      <li data-ph="1"><span class="mono no">P1</span><div><h3>Shadow mode</h3><p>30 epochs of sealed public calls, zero execution. Hypothetical charted next to real.</p></div><span class="mono cur">● CURRENT</span></li>
+      <li data-ph="2"><span class="mono no">P2</span><div><h3>Reduced limits</h3><p>Execution live at 7% NAV turnover, 20% weight cap.</p></div><span class="mono cur">● CURRENT</span></li>
+      <li data-ph="3"><span class="mono no">P3</span><div><h3>Full mandate</h3><p>A holder vote unlocks 35% weights, 20% NAV turnover, new whitelist entries.</p></div><span class="mono cur">● CURRENT</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= END ================= -->
+<section class="fin rv">
+  <div class="wrap">
+    <h2>YOUR CAPITAL. THE AGENT'S DECISIONS.<br><span class="hl">THE CONTRACT'S LIMITS.</span></h2>
+    <a class="btn mono" href="console.html">OPEN THE LIVE CONSOLE&nbsp;→</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="ft mono">
+  NOSTRO AGENT — LAUNCHING ON PONS V2 · ROBINHOOD CHAIN (4663) · UNISWAP V4.
+  NOT AN OFFER. AGENT DECISIONS ARE HASH-COMMITTED ON-CHAIN BEFORE EXECUTION.
+</footer>
+
+<script src="front.js"></script>
+</body>
+</html>
