@@ -18,6 +18,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from random import Random
 
+ROOT = Path(__file__).resolve().parent
+
 # ==== crypto ====================================================
 # keccak256 (original Keccak, 0x01 padding) — NOT hashlib.sha3_256,
 # which is the NIST variant with 0x06 padding and different digests.
@@ -586,9 +588,119 @@ class Sim:
         }
 
 
+# ==== live chain ================================================
+
+CONFIG_PATH = Path(os.environ.get("NSTRO_CONFIG") or (ROOT / "nstro.json"))
+FEE_VAULT_ADDR = "0xB2FC6481A65BACc91277a3488dcc7f6b1C210813"
+SEL_NAME, SEL_SYMBOL = "0x06fdde03", "0x95d89b41"
+SEL_DECIMALS, SEL_TOTAL = "0x313ce567", "0x18160ddd"
+SEL_PREVIEW_UNITS = "0x0d85a3ad"
+
+
+class RpcError(Exception):
+    pass
+
+
+def load_config():
+    try:
+        cfg = json.loads(CONFIG_PATH.read_text())
+        if isinstance(cfg, dict) and cfg.get("mode") in ("sim", "live"):
+            return cfg
+    except (OSError, ValueError):
+        pass
+    return {"mode": "sim"}
+
+
+def rpc_call(url, method, params, timeout=4):
+    payload = json.dumps({"jsonrpc": "2.0", "id": 1,
+                          "method": method, "params": params}).encode()
+    req = urllib.request.Request(url, data=payload,
+                                 headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            out = json.loads(r.read())
+    except (OSError, ValueError) as exc:
+        raise RpcError("rpc unreachable: %s" % exc) from exc
+    if "error" in out:
+        raise RpcError(str(out["error"].get("message", out["error"])))
+    return out.get("result")
+
+
+def eth_call(url, to, data_hex):
+    ret = rpc_call(url, "eth_call", [{"to": to, "data": data_hex}, "latest"])
+    if not ret or ret == "0x":
+        raise RpcError("empty return")
+    return bytes.fromhex(ret[2:])
+
+
+def decode_uint(ret):
+    return int.from_bytes(ret[:32], "big")
+
+
+def decode_abi_string(ret):
+    off = int.from_bytes(ret[0:32], "big")
+    ln = int.from_bytes(ret[off:off + 32], "big")
+    return ret[off + 32:off + 32 + ln].decode("utf-8", "replace")
+
+
+def build_live(cfg):
+    url, vault = cfg.get("rpc_url") or DEFAULT_RPC, cfg.get("vault")
+    try:
+        chain_id = int(rpc_call(url, "eth_chainId", []), 16)
+        block = int(rpc_call(url, "eth_blockNumber", []), 16)
+        code = rpc_call(url, "eth_getCode", [vault, "latest"]) or "0x"
+        if code == "0x":
+            return {"ok": False, "error": "no contract code at %s" % vault}
+        live = {"ok": True, "chain_id": chain_id, "block": block,
+                "vault": vault, "code_size": (len(code) - 2) // 2}
+        try:
+            eth_call(url, vault, SEL_PREVIEW_UNITS + "0" * 64)
+            live["kind"] = "vault"
+        except RpcError:
+            live["kind"] = "token"
+        for key, sel, dec in (("name", SEL_NAME, decode_abi_string),
+                              ("symbol", SEL_SYMBOL, decode_abi_string),
+                              ("decimals", SEL_DECIMALS, decode_uint)):
+            try:
+                live[key] = dec(eth_call(url, vault, sel))
+            except (RpcError, UnicodeDecodeError, IndexError):
+                pass
+        try:
+            supply = decode_uint(eth_call(url, vault, SEL_TOTAL))
+            live["total_supply"] = supply / 10 ** live.get("decimals", 18)
+        except (RpcError, IndexError):
+            pass
+        return live
+    except RpcError as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def start_live_poller(srv):
+    def run():
+        mtime = None
+        while True:
+            try:
+                new_mtime = CONFIG_PATH.stat().st_mtime if CONFIG_PATH.exists() else None
+                if new_mtime != mtime:
+                    mtime = new_mtime
+                    with srv.sim_lock:
+                        srv.config = load_config()
+                        srv.live_snapshot = None
+                cfg = srv.config
+                if cfg.get("mode") == "live" and cfg.get("vault"):
+                    snap = build_live(cfg)              # network: outside the lock
+                    with srv.sim_lock:
+                        srv.live_snapshot = snap
+            except Exception as exc:
+                print("live poll error: %r" % exc, file=sys.stderr)
+            time.sleep(4)
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
+    return t
+
+
 # ==== http ======================================================
 
-ROOT = Path(__file__).resolve().parent
 CONTENT_TYPES = {".html": "text/html; charset=utf-8", ".css": "text/css",
                  ".js": "application/javascript", ".svg": "image/svg+xml",
                  ".jpg": "image/jpeg", ".json": "application/json",
@@ -620,6 +732,11 @@ class NodeHandler(BaseHTTPRequestHandler):
             with srv.sim_lock:
                 state = srv.sim.snapshot()
                 state["public"] = srv.public
+                cfg = srv.config
+                if cfg.get("mode") == "live":
+                    state["mode"] = "live"
+                    state["config"] = {"rpc_url": cfg.get("rpc_url") or DEFAULT_RPC}
+                    state["live"] = srv.live_snapshot
             return self._json(state)
         if path == "/api/claims":
             return self._json({"distributor": None, "rounds": []})
@@ -695,7 +812,8 @@ def make_node(port, seed=None, public=False, config=None):
     srv.sim = Sim(seed=seed)
     srv.sim_lock = threading.Lock()
     srv.public = public
-    srv.config = config or {"mode": "sim"}   # Task 8 replaces the fallback with load_config()
+    srv.config = config or load_config()
+    srv.live_snapshot = None
     return srv
 
 
@@ -729,6 +847,7 @@ def main(argv=None):
         print("port %d is busy — pick another with --port" % args.port)
         return 1
     start_ticker(srv)
+    start_live_poller(srv)
     print("nostro node: http://localhost:%d  (Ctrl+C to stop)" % args.port)
     try:
         srv.serve_forever()

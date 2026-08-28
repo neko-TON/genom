@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 import threading
 import unittest
@@ -436,6 +437,121 @@ class TestHttp(unittest.TestCase):
         with self.assertRaises(_rqerr.HTTPError) as ctx:
             _rq.urlopen(req, timeout=5)
         self.assertEqual(ctx.exception.code, 400)
+
+
+import http.server as _hs
+import subprocess
+import tempfile
+
+
+def _abi_str(s):
+    b = s.encode()
+    pad = b + b"\x00" * ((32 - len(b) % 32) % 32)
+    return ((32).to_bytes(32, "big") + len(b).to_bytes(32, "big") + pad).hex()
+
+
+MOCK_CALLS = {
+    "0x06fdde03": _abi_str("Mock Token"),      # name()
+    "0x95d89b41": _abi_str("MCK"),             # symbol()
+    "0x313ce567": (18).to_bytes(32, "big").hex(),          # decimals()
+    "0x18160ddd": (10 ** 27).to_bytes(32, "big").hex(),    # totalSupply()
+}
+
+
+class MockRpc(_hs.BaseHTTPRequestHandler):
+    def log_message(self, *a):
+        pass
+
+    def do_POST(self):
+        req = _json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+        m, params = req["method"], req.get("params") or []
+        if m == "eth_chainId":
+            result = "0x1237"
+        elif m == "eth_blockNumber":
+            result = "0x100"
+        elif m == "eth_getCode":
+            result = "0x6080604052"
+        elif m == "eth_call":
+            sel = params[0]["data"][:10]
+            if sel in MOCK_CALLS:
+                result = "0x" + MOCK_CALLS[sel]
+            else:                                   # previewUnits etc. → revert
+                body = _json.dumps({"jsonrpc": "2.0", "id": req["id"],
+                                    "error": {"code": 3, "message": "revert"}}).encode()
+                self.send_response(200)
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+                return
+        else:
+            result = "0x0"
+        body = _json.dumps({"jsonrpc": "2.0", "id": req["id"],
+                            "result": result}).encode()
+        self.send_response(200)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+
+class TestLive(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rpc = _hs.HTTPServer(("127.0.0.1", 0), MockRpc)
+        cls.rpc_url = "http://127.0.0.1:%d" % cls.rpc.server_address[1]
+        threading.Thread(target=cls.rpc.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.rpc.shutdown()
+
+    def test_rpc_call(self):
+        self.assertEqual(server.rpc_call(self.rpc_url, "eth_chainId", []), "0x1237")
+
+    def test_build_live_token(self):
+        cfg = {"mode": "live", "vault": "0x" + "12" * 20, "rpc_url": self.rpc_url}
+        live = server.build_live(cfg)
+        self.assertTrue(live["ok"])
+        self.assertEqual(live["kind"], "token")
+        self.assertEqual(live["chain_id"], 4663)
+        self.assertEqual(live["block"], 256)
+        self.assertEqual(live["name"], "Mock Token")
+        self.assertEqual(live["symbol"], "MCK")
+        self.assertEqual(live["decimals"], 18)
+        self.assertAlmostEqual(live["total_supply"], 10 ** 9)   # 1e27 / 1e18
+        self.assertGreater(live["code_size"], 0)
+
+    def test_build_live_unreachable(self):
+        cfg = {"mode": "live", "vault": "0x" + "12" * 20,
+               "rpc_url": "http://127.0.0.1:1"}
+        live = server.build_live(cfg)
+        self.assertFalse(live["ok"])
+        self.assertTrue(live["error"])
+
+    def test_decode_abi_string(self):
+        self.assertEqual(server.decode_abi_string(bytes.fromhex(_abi_str("hey"))), "hey")
+
+    def test_cli_connect_and_sim(self):
+        cli = str(Path(server.__file__).parent / "nstro")
+        addr = "0x" + "ab" * 20
+        env = dict(os.environ, NSTRO_CONFIG=str(
+            Path(tempfile.mkdtemp()) / "nstro.json"))
+        r = subprocess.run([sys.executable, cli, "connect", addr, self.rpc_url],
+                           capture_output=True, text=True, env=env)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        cfg = _json.loads(Path(env["NSTRO_CONFIG"]).read_text())
+        self.assertEqual(cfg["mode"], "live")
+        self.assertEqual(cfg["vault"], addr)
+        r = subprocess.run([sys.executable, cli, "sim"],
+                           capture_output=True, text=True, env=env)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(_json.loads(
+            Path(env["NSTRO_CONFIG"]).read_text())["mode"], "sim")
+
+    def test_cli_rejects_bad_address(self):
+        cli = str(Path(server.__file__).parent / "nstro")
+        r = subprocess.run([sys.executable, cli, "connect", "nonsense"],
+                           capture_output=True, text=True)
+        self.assertNotEqual(r.returncode, 0)
 
 
 if __name__ == "__main__":
