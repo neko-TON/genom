@@ -330,6 +330,9 @@ class TestTreasuryGov(unittest.TestCase):
         self.to_epoch(eta)
         self.assertFalse(self.sim.frozen)
         self.assertEqual(self.sim.gov_queue, [])
+        for _ in range(3):                      # flat post-unfreeze closes
+            self.sim.force_close()
+        self.assertFalse(self.sim.frozen)       # vote must not be nullified
 
     def test_phase3_vote(self):
         self.assertFalse(self.sim.gov("phase3"))            # not in phase 2 yet
@@ -429,6 +432,7 @@ class TestHttp(unittest.TestCase):
     def test_bad_requests(self):
         for path, body in [("/api/control", {"action": "explode"}),
                            ("/api/trade", {"side": "buy", "amount": -5}),
+                           ("/api/trade", {"side": "buy", "amount": 1e999}),
                            ("/api/gov", {})]:
             req = _rq.Request(self.url(path), data=_json.dumps(body).encode(),
                               headers={"Content-Type": "application/json"})

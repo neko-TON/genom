@@ -181,6 +181,7 @@ class Sim:
         self.epoch_cost = 120.0
         self.protocol_fund = 0.0
         self.freeze_epoch = 0
+        self._uv_guard_start = 0
         # __init__ additions (Task 5)
         self._pending_commit = None      # {"epoch","weights","thesis","nonce","hash","committed_at"}
         self._force_bad_next = False
@@ -353,14 +354,14 @@ class Sim:
         if self.hold_mode and not was_hold:
             self.log("runway under 14 days — hold mode: one rebalance per 3 epochs")
         if not self.frozen and len(self.uv) >= 2:
-            peak = max(self.uv[-7:])
-            if self.uv[-1] <= 0.75 * peak:
+            window = self.uv[max(len(self.uv) - 7, self._uv_guard_start):]
+            if window and self.uv[-1] <= 0.75 * max(window):
                 self.frozen = True
                 self.freeze_epoch = self.epoch
                 nav = self.nav()
                 self.positions = {a: 0.0 for a in WHITELIST}
                 self.positions[CASH] = nav
-                self.log("BREAKER: drawdown ≤ −25%% over 7 epochs — frozen, "
+                self.log("BREAKER: drawdown ≤ −25% over 7 epochs — frozen, "
                          "basket parked in USDG")
         for g in [g for g in self.gov_queue if g["eta"] <= self.epoch + 1]:
             self.gov_queue.remove(g)
@@ -369,6 +370,7 @@ class Sim:
                 self.log("governance: phase 3 unlocked — full mandate")
             elif g["action"] == "unfreeze":
                 self.frozen = False
+                self._uv_guard_start = len(self.uv)
                 self.log("governance: agent unfrozen by holder vote")
 
     def _reveal_pending(self):
@@ -810,6 +812,7 @@ class NodeHandler(BaseHTTPRequestHandler):
             if self.path == "/api/trade":
                 side, amount = body.get("side"), body.get("amount")
                 if side not in ("buy", "sell") or not isinstance(amount, (int, float)) \
+                        or isinstance(amount, bool) or not math.isfinite(amount) \
                         or not amount > 0:
                     return self._bad("bad trade")
                 sim.trade(side, amount)
