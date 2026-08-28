@@ -120,6 +120,9 @@ class TestSimSkeleton(unittest.TestCase):
         self.assertEqual(s["epoch"], 1)
         self.assertEqual(s["phase"], 0)
         json.dumps(s)  # must be JSON-serializable
+        self.assertEqual(s["prices"]["USDG"], 1.0)
+        t = s["treasury"]
+        self.assertEqual(t["runway_days"], round(t["runway_days"], 1))
 
     def test_weights_sum_10000(self):
         for _ in range(5):
@@ -305,7 +308,7 @@ class TestTreasuryGov(unittest.TestCase):
         self.assertGreater(t["usdg"], 0)
         self.assertGreater(t["epoch_cost"], 0)
         self.assertGreater(t["inflow_tax"], 0)
-        self.assertAlmostEqual(t["runway_days"], t["usdg"] / t["epoch_cost"], places=3)
+        self.assertAlmostEqual(t["runway_days"], round(t["usdg"] / t["epoch_cost"], 1), places=6)
 
     def test_guard_limits_follow_phase(self):
         self.to_epoch(10)

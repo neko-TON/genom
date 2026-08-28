@@ -564,7 +564,7 @@ class Sim:
             "nav": self.nav(), "unit_value": self.unit_value(),
             "unit_values": list(self.uv) or [1.0],
             "shadow_uv": list(self.shadow_uv),
-            "weights": self.weights_bps(), "prices": dict(self.prices),
+            "weights": self.weights_bps(), "prices": dict({**self.prices, CASH: 1.0}),
             "pending_quote": self.pending_quote(),
             "volume_epoch": self.volume_epoch,
             "epochs": list(self.epochs), "track": list(self.track),
@@ -573,7 +573,7 @@ class Sim:
                                            "claimed_value")}
                         for h in self.holders],
             "treasury": {
-                "runway_days": self.treasury_usdg / self.epoch_cost,
+                "runway_days": round(self.treasury_usdg / self.epoch_cost, 1),
                 "usdg": self.treasury_usdg, "epoch_cost": self.epoch_cost,
                 "inflow_tax": self._tre_inflow_tax,
                 "inflow_creator": self._tre_inflow_creator,
