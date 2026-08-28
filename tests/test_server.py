@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -95,6 +96,73 @@ class TestAbiEncode(unittest.TestCase):
         a = server.make_nonce(server.Random(1))
         b = server.make_nonce(server.Random(1))
         self.assertEqual(a, b)
+
+SIM_TOP_KEYS = {
+    "mode", "public", "config", "epoch", "t", "phase", "paused", "speed",
+    "epoch_progress", "nav", "unit_value", "unit_values", "shadow_uv",
+    "weights", "prices", "pending_quote", "volume_epoch", "epochs", "track",
+    "holders", "treasury", "guard", "gov_queue", "log",
+}
+
+
+class TestSimSkeleton(unittest.TestCase):
+    def setUp(self):
+        self.sim = server.Sim(seed=42)
+
+    def test_snapshot_schema(self):
+        s = self.sim.snapshot()
+        self.assertEqual(SIM_TOP_KEYS - set(s), set())
+        self.assertEqual(s["mode"], "sim")
+        self.assertIs(s["public"], False)
+        self.assertIn("rpc_url", s["config"])
+        self.assertEqual(s["epoch"], 1)
+        self.assertEqual(s["phase"], 0)
+        json.dumps(s)  # must be JSON-serializable
+
+    def test_weights_sum_10000(self):
+        for _ in range(5):
+            self.sim.advance(20000)
+            self.assertEqual(sum(self.sim.weights_bps().values()), 10000)
+
+    def test_epoch_rollover(self):
+        self.sim.advance(86400 * 2.5)
+        self.assertEqual(self.sim.epoch, 3)
+        self.assertEqual(len(self.sim.uv), 2)
+        prog = self.sim.snapshot()["epoch_progress"]
+        self.assertGreater(prog, 0.45)
+        self.assertLess(prog, 0.55)
+
+    def test_force_close(self):
+        self.sim.advance(100)
+        self.sim.force_close()
+        self.assertEqual(self.sim.epoch, 2)
+
+    def test_pause_blocks_time(self):
+        self.sim.paused = True
+        t0 = self.sim.t
+        self.sim.advance(5000)
+        self.assertEqual(self.sim.t, t0)
+
+    def test_phase_progression(self):
+        for _ in range(2):
+            self.sim.force_close()
+        self.assertEqual(self.sim.phase, 1)   # epochs 1-2 passive, 3+ shadow
+        for _ in range(6):
+            self.sim.force_close()
+        self.assertEqual(self.sim.phase, 2)   # epoch 9+ reduced limits
+
+    def test_prices_move_and_stay_positive(self):
+        p0 = dict(self.sim.prices)
+        self.sim.advance(86400)
+        moved = sum(1 for a in server.WHITELIST if self.sim.prices[a] != p0[a])
+        self.assertGreater(moved, 5)
+        for a, p in self.sim.prices.items():
+            self.assertGreater(p, 0)
+
+    def test_deterministic_with_seed(self):
+        a, b = server.Sim(seed=1), server.Sim(seed=1)
+        a.advance(50000), b.advance(50000)
+        self.assertEqual(a.prices, b.prices)
 
 
 if __name__ == "__main__":

@@ -100,3 +100,140 @@ def make_nonce(rng=None):
     if rng is None:
         return os.urandom(32)
     return bytes(rng.randrange(256) for _ in range(32))
+
+
+# ==== simulation ================================================
+
+WHITELIST = ["AAPL", "TSLA", "NVDA", "MSFT", "AMZN", "GOOGL", "META", "HOOD", "COIN", "PLTR"]
+CASH = "USDG"
+EPOCH_SIM = 86400.0
+TOKEN_PRICE = 0.001            # USDG per $NSTRO, for volume accounting
+START_PRICES = {"AAPL": 235.0, "TSLA": 340.0, "NVDA": 185.0, "MSFT": 520.0,
+                "AMZN": 230.0, "GOOGL": 200.0, "META": 780.0, "HOOD": 95.0,
+                "COIN": 310.0, "PLTR": 155.0}
+START_NAV = 250_000.0
+DEFAULT_RPC = "https://rpc.mainnet.chain.robinhood.com"
+
+
+class Sim:
+    def __init__(self, seed=None):
+        self.rng = Random(seed)
+        self.t = 0.0
+        self.epoch = 1
+        self.epoch_start = 0.0
+        self.paused = False
+        self.speed = 1440.0                      # sim sec per real sec (epoch = 60s)
+        self.phase = 0
+        self.frozen = False
+        self.prices = dict(START_PRICES)
+        self._drift = {a: self.rng.uniform(-0.001, 0.002) for a in WHITELIST}
+        self._sigma = {a: self.rng.uniform(0.015, 0.035) for a in WHITELIST}
+        # initial basket: 8% each stock, 20% cash
+        self.positions = {a: START_NAV * 0.08 / START_PRICES[a] for a in WHITELIST}
+        self.positions[CASH] = START_NAV * 0.20
+        self.units = START_NAV                   # unit_value starts at 1.0
+        self.uv = []
+        self.shadow_uv = []
+        self.epochs = []
+        self.track = []
+        self.gov_queue = []
+        self.log_items = []
+        self.log("node online — passive index, phase 0")
+
+    # ---- helpers ----
+    def log(self, msg):
+        self.log_items.append({"t": self.t, "msg": msg})
+        del self.log_items[:-200]
+
+    def nav(self):
+        return sum(self.positions[a] * self.price_of(a) for a in self.positions)
+
+    def price_of(self, asset):
+        return 1.0 if asset == CASH else self.prices[asset]
+
+    def unit_value(self):
+        return self.nav() / self.units
+
+    def weights_bps(self):
+        nav = self.nav()
+        out, acc, assets = {}, 0, list(self.positions)
+        for a in assets[:-1]:
+            w = round(self.positions[a] * self.price_of(a) / nav * 10000)
+            out[a], acc = w, acc + w
+        out[assets[-1]] = 10000 - acc            # force exact sum
+        return out
+
+    def set_speed(self, sim_per_real):
+        self.speed = max(24.0, min(sim_per_real, 86400.0))
+
+    # ---- time ----
+    def advance(self, dt_sim):
+        if self.paused:
+            return
+        remaining = dt_sim
+        while remaining > 1e-9:
+            boundary = self.epoch_start + EPOCH_SIM
+            step = min(remaining, boundary - self.t)
+            self._integrate(step)
+            remaining -= step
+            if self.t >= boundary - 1e-9:
+                self._close_epoch()
+
+    def force_close(self):
+        self._close_epoch()
+
+    def _integrate(self, dt):
+        self.t += dt
+        dt_days = dt / EPOCH_SIM
+        for a in WHITELIST:
+            g = self.rng.gauss(0.0, 1.0)
+            mu, sg = self._drift[a], self._sigma[a]
+            self.prices[a] *= math.exp((mu - 0.5 * sg * sg) * dt_days
+                                       + sg * math.sqrt(dt_days) * g)
+
+    def _close_epoch(self):
+        uv_now = self.unit_value()
+        prev = self.uv[-1] if self.uv else 1.0
+        self.uv.append(uv_now)
+        del self.uv[:-400]
+        self.epochs.append({
+            "n": self.epoch, "dnav_pct": (uv_now / prev - 1.0) * 100.0,
+            "checks": [], "cancelled": None, "executed": False,
+            "turnover_bps": 0, "exec": None, "phase": self.phase,
+        })
+        del self.epochs[:-200]
+        self._on_close()
+        self.epoch += 1
+        self.epoch_start = self.t     # force_close may fire mid-epoch
+        if self.phase < 1 and self.epoch >= 3:
+            self.phase = 1
+            self.log("phase 1 — shadow mode: sealed calls, no execution")
+        if self.phase < 2 and self.epoch >= 9:
+            self.phase = 2
+            self.log("phase 2 — execution live at reduced limits")
+
+    def _on_close(self):
+        pass  # extended in later tasks
+
+    # ---- snapshot ----
+    def snapshot(self):
+        return {
+            "mode": "sim", "public": False,
+            "config": {"rpc_url": DEFAULT_RPC},
+            "epoch": self.epoch, "t": self.t, "phase": self.phase,
+            "paused": self.paused, "speed": self.speed,
+            "epoch_progress": max(0.0, min(1.0, (self.t - self.epoch_start) / EPOCH_SIM)),
+            "nav": self.nav(), "unit_value": self.unit_value(),
+            "unit_values": list(self.uv) or [1.0],
+            "shadow_uv": list(self.shadow_uv),
+            "weights": self.weights_bps(), "prices": dict(self.prices),
+            "pending_quote": 0.0, "volume_epoch": 0.0,
+            "epochs": list(self.epochs), "track": list(self.track),
+            "holders": [], "treasury": {"runway_days": 0.0, "usdg": 0.0,
+                                        "epoch_cost": 0.0, "inflow_tax": 0.0,
+                                        "inflow_creator": 0.0, "protocol_fund": 0.0,
+                                        "hold_mode": False},
+            "guard": {"frozen": self.frozen, "freeze_epoch": 0,
+                      "limits": {"max_weight_bps": 3500, "turnover_bps": 2000}},
+            "gov_queue": list(self.gov_queue), "log": list(self.log_items),
+        }
