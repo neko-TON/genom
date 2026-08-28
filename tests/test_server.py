@@ -50,5 +50,52 @@ class TestKeccak(unittest.TestCase):
         self.assertEqual(server.keccak256(b"x" * 300), server.keccak256(b"x" * 300))
 
 
+class TestAbiEncode(unittest.TestCase):
+    def test_static_only(self):
+        # abi.encode(uint256 1, uint256[] [], string "", bytes32 0x00..00)
+        # head: value, arr offset 0x80, str offset 0xa0, bytes32; tails: two zero lengths
+        out = server.abi_encode_commit(1, [], "", b"\x00" * 32)
+        expect = (
+            "0000000000000000000000000000000000000000000000000000000000000001"
+            "0000000000000000000000000000000000000000000000000000000000000080"
+            "00000000000000000000000000000000000000000000000000000000000000a0"
+            "0000000000000000000000000000000000000000000000000000000000000000"
+            "0000000000000000000000000000000000000000000000000000000000000000"
+            "0000000000000000000000000000000000000000000000000000000000000000"
+        )
+        self.assertEqual(out.hex(), expect)
+
+    def test_full(self):
+        # abi.encode(uint256 2, uint256[] [3500, 6500], string "hi", bytes32 0xaa..aa)
+        # 3500 = 0xdac, 6500 = 0x1964, str offset = 0x80 + 32 + 2*32 = 0xe0
+        out = server.abi_encode_commit(2, [3500, 6500], "hi", b"\xaa" * 32)
+        expect = (
+            "0000000000000000000000000000000000000000000000000000000000000002"
+            "0000000000000000000000000000000000000000000000000000000000000080"
+            "00000000000000000000000000000000000000000000000000000000000000e0"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "0000000000000000000000000000000000000000000000000000000000000002"
+            "0000000000000000000000000000000000000000000000000000000000000dac"
+            "0000000000000000000000000000000000000000000000000000000000001964"
+            "0000000000000000000000000000000000000000000000000000000000000002"
+            "6869000000000000000000000000000000000000000000000000000000000000"
+        )
+        self.assertEqual(out.hex(), expect)
+
+    def test_commit_hash_roundtrip(self):
+        nonce = server.make_nonce()
+        self.assertEqual(len(nonce), 32)
+        h = server.commit_hash(7, [2000, 8000], "cash up", nonce)
+        self.assertTrue(h.startswith("0x") and len(h) == 66)
+        self.assertEqual(h, server.commit_hash(7, [2000, 8000], "cash up", nonce))
+        self.assertNotEqual(h, server.commit_hash(7, [2000, 8000], "cash up!", nonce))
+        self.assertNotEqual(h, server.commit_hash(8, [2000, 8000], "cash up", nonce))
+
+    def test_deterministic_nonce(self):
+        a = server.make_nonce(server.Random(1))
+        b = server.make_nonce(server.Random(1))
+        self.assertEqual(a, b)
+
+
 if __name__ == "__main__":
     unittest.main()

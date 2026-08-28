@@ -78,3 +78,25 @@ def keccak256(data):
     for i in range(4):
         out += a[i % 5][i // 5].to_bytes(8, "little")
     return out
+
+
+def abi_encode_commit(epoch, weights_bps, thesis, nonce32):
+    """Solidity abi.encode(uint256, uint256[], string, bytes32)."""
+    def word(n):
+        return int(n).to_bytes(32, "big")
+    text = thesis.encode("utf-8")
+    arr_tail = word(len(weights_bps)) + b"".join(word(w) for w in weights_bps)
+    str_tail = word(len(text)) + text + b"\x00" * ((32 - len(text) % 32) % 32)
+    arr_off = 32 * 4
+    str_off = arr_off + len(arr_tail)
+    return word(epoch) + word(arr_off) + word(str_off) + nonce32 + arr_tail + str_tail
+
+
+def commit_hash(epoch, weights_bps, thesis, nonce32):
+    return "0x" + keccak256(abi_encode_commit(epoch, weights_bps, thesis, nonce32)).hex()
+
+
+def make_nonce(rng=None):
+    if rng is None:
+        return os.urandom(32)
+    return bytes(rng.randrange(256) for _ in range(32))
