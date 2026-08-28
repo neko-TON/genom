@@ -222,5 +222,70 @@ class TestAccrual(unittest.TestCase):
             self.assertIn(k, h)
 
 
+class TestAgent(unittest.TestCase):
+    def setUp(self):
+        self.sim = server.Sim(seed=11)
+
+    def to_epoch(self, n):
+        while self.sim.epoch < n:
+            self.sim.force_close()
+
+    def test_no_commits_in_phase0(self):
+        self.assertEqual(self.sim.track, [])
+        self.sim.force_close()
+        self.assertEqual(self.sim.track, [])          # still phase 0 after epoch 1
+
+    def test_commit_seal_and_reveal(self):
+        self.to_epoch(4)
+        sealed = [r for r in self.sim.track if not r["revealed"]]
+        self.assertEqual(len(sealed), 1)              # exactly one pending decision
+        rec = sealed[0]
+        self.assertEqual(rec["epoch"], self.sim.epoch)
+        self.assertIsNone(rec["thesis"])
+        self.assertRegex(rec["hash"], r"^0x[0-9a-f]{64}$")
+        self.sim.force_close()
+        rec = next(r for r in self.sim.track if r["epoch"] == rec["epoch"])
+        self.assertTrue(rec["revealed"])
+        self.assertTrue(rec["verified"])              # keccak recomputed and matched
+        self.assertTrue(rec["thesis"])
+
+    def test_guard_checks_present_and_named(self):
+        self.to_epoch(5)
+        last = next(e for e in reversed(self.sim.epochs) if e["checks"])
+        self.assertEqual(
+            [c["name"] for c in last["checks"]],
+            ["whitelist", "max weight", "min position", "turnover",
+             "single rebalance", "cash band", "weights sum", "agent status"])
+
+    def test_bad_vector_cancels_and_freezes_basket(self):
+        self.to_epoch(10)                              # phase 2, execution on
+        w_before = self.sim.weights_bps()
+        self.sim._force_bad_next = True
+        self.sim.force_close()
+        rec = self.sim.epochs[-1]
+        self.assertIsNotNone(rec["cancelled"])
+        self.assertFalse(rec["executed"])
+        bad = [c for c in rec["checks"] if not c["ok"]]
+        self.assertTrue(bad)
+        w_after = self.sim.weights_bps()
+        for a in w_before:                             # basket did not move
+            self.assertLessEqual(abs(w_after[a] - w_before[a]), 60)  # only price drift
+
+    def test_execution_respects_turnover(self):
+        self.to_epoch(16)
+        executed = [e for e in self.sim.epochs if e["executed"]]
+        self.assertTrue(executed)
+        for e in executed:
+            limit = server.PHASE_LIMITS[e["phase"]][1]
+            self.assertLessEqual(e["turnover_bps"], limit)
+            self.assertTrue(e["exec"]["trades"])
+            self.assertGreater(e["exec"]["cost"], 0)
+
+    def test_shadow_series_grows_from_phase1(self):
+        self.to_epoch(12)
+        self.assertGreater(len(self.sim.shadow_uv), 3)
+        self.assertLessEqual(len(self.sim.shadow_uv), len(self.sim.uv))
+
+
 if __name__ == "__main__":
     unittest.main()

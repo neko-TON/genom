@@ -114,6 +114,21 @@ START_PRICES = {"AAPL": 235.0, "TSLA": 340.0, "NVDA": 185.0, "MSFT": 520.0,
 START_NAV = 250_000.0
 DEFAULT_RPC = "https://rpc.mainnet.chain.robinhood.com"
 
+PHASE_LIMITS = {0: (3500, 2000), 1: (3500, 2000), 2: (2000, 700), 3: (3500, 2000)}
+
+THESIS_LEADS = [
+    "Momentum in {a} and {b} remains intact; adding on strength.",
+    "Trimming {a} after the run, rotating into {b}.",
+    "Earnings setup favors {a}; keeping {b} at benchmark weight.",
+    "Volatility regime is rising; concentration in {a} comes down.",
+    "Flows into tokenized {a} keep improving; {b} stays a funding source.",
+]
+THESIS_TAILS = [
+    "Cash held at {c}% as dry powder.",
+    "Raising cash to {c}% ahead of the macro print.",
+    "Cash at {c}%; turnover kept well inside the mandate.",
+]
+
 
 class Sim:
     def __init__(self, seed=None):
@@ -159,6 +174,13 @@ class Sim:
         self._tre_inflow_tax = 0.0
         self._tre_inflow_creator = 0.0
         self._tre_protocol = 0.0
+        # __init__ additions (Task 5)
+        self._pending_commit = None      # {"epoch","weights","thesis","nonce","hash","committed_at"}
+        self._force_bad_next = False
+        self._bad_cadence = self.rng.randrange(8, 13)
+        self.last_rebalance_epoch = 0
+        self.hold_mode = False
+        self._shadow_positions = None    # dict like self.positions, set at phase 1 entry
         self.log("node online — passive index, phase 0")
 
     # ---- helpers ----
@@ -312,6 +334,178 @@ class Sim:
         self._supply_integral = 0.0
         self.volume_epoch = 0.0
         self._sniper_fired = False
+        self._reveal_pending()
+        if self.phase >= 1 or self.epoch >= 2:   # first proposal at close of epoch 2
+            self._agent_cycle()
+        self._update_shadow()
+
+    def _reveal_pending(self):
+        if not self._pending_commit or self._pending_commit["epoch"] != self.epoch:
+            return
+        p = self._pending_commit
+        rec = next((r for r in self.track if r["epoch"] == p["epoch"]), None)
+        if rec:
+            rec["revealed"] = True
+            rec["verified"] = commit_hash(p["epoch"], p["weights_list"],
+                                          p["thesis"], p["nonce"]) == rec["hash"]
+            rec["thesis"] = p["thesis"]
+            rec["revealed_at"] = self.t
+            self.log("epoch %d thesis revealed — keccak %s" %
+                     (p["epoch"], "verified" if rec["verified"] else "MISMATCH"))
+        self._pending_commit = None
+
+    def _propose_weights(self):
+        cur = self.weights_bps()
+        max_w, max_turn = PHASE_LIMITS[self.phase]
+        target = dict(cur)
+        if self._force_bad_next or (self.epoch % self._bad_cadence == 0
+                                    and self.phase >= 1):
+            self._force_bad_next = False
+            hot = self.rng.choice(WHITELIST)
+            target[hot] = max_w + self.rng.randrange(500, 1500)   # deliberate violation
+            self._rebalance_to_sum(target)
+            return target
+        if self.hold_mode and self.epoch - self.last_rebalance_epoch < 3:
+            return dict(cur)                                       # keep-current
+        budget = max_turn - 100                                    # stay inside limit
+        for _ in range(self.rng.randrange(2, 5)):
+            a = self.rng.choice(WHITELIST + [CASH])
+            delta = self.rng.randrange(50, max(60, budget // 3))
+            src = max(target, key=lambda s: target[s] if s != a else -1)
+            delta = min(delta, target[src] - (0 if src == CASH else 500))
+            if delta <= 0:
+                continue
+            target[a] = target.get(a, 0) + delta
+            target[src] -= delta
+        for a in WHITELIST:                                        # enforce caps/floors
+            target[a] = min(target.get(a, 0), max_w)
+            if 0 < target[a] < 500:
+                target[CASH] += target[a]
+                target[a] = 0
+        self._rebalance_to_sum(target)
+        return target
+
+    def _rebalance_to_sum(self, target):
+        diff = 10000 - sum(target.values())
+        target[CASH] = max(0, target.get(CASH, 0) + diff)
+        drift = 10000 - sum(target.values())
+        if drift:                                    # cash clamped at 0 — adjust largest
+            big = max((a for a in target if a != CASH), key=lambda a: target[a])
+            target[big] += drift
+
+    def _make_thesis(self, target):
+        stocks = sorted((a for a in WHITELIST if target.get(a)),
+                        key=lambda a: -target[a])
+        if not stocks:
+            return "Basket parked in USDG; awaiting mandate."
+        a, b = stocks[0], stocks[1 if len(stocks) > 1 else 0]
+        lead = self.rng.choice(THESIS_LEADS).format(a=a, b=b)
+        tail = self.rng.choice(THESIS_TAILS).format(c=round(target.get(CASH, 0) / 100))
+        return lead + " " + tail
+
+    def _guard_checks(self, target):
+        cur = self.weights_bps()
+        max_w, max_turn = PHASE_LIMITS[self.phase]
+        turnover = sum(abs(target.get(a, 0) - cur.get(a, 0))
+                       for a in set(cur) | set(target)) // 2
+        checks = []
+        bad_assets = [a for a in target if a != CASH and a not in WHITELIST]
+        checks.append({"name": "whitelist", "ok": not bad_assets,
+                       "detail": ("%d assets checked" % len(target)) if not bad_assets
+                       else "%s not whitelisted" % bad_assets[0]})
+        top = max((a for a in target if a != CASH), key=lambda a: target[a])
+        checks.append({"name": "max weight", "ok": target[top] <= max_w,
+                       "detail": "top %s %.1f%% %s %.1f%%" % (
+                           top, target[top] / 100,
+                           "≤" if target[top] <= max_w else ">", max_w / 100)})
+        small = [a for a in target if a != CASH and 0 < target[a] < 500]
+        checks.append({"name": "min position", "ok": not small,
+                       "detail": "all positions ≥ 5% or zero" if not small
+                       else "%s at %.1f%% < 5%%" % (small[0], target[small[0]] / 100)})
+        checks.append({"name": "turnover", "ok": turnover <= max_turn,
+                       "detail": "%.1f%% %s %.1f%% NAV" % (
+                           turnover / 100, "≤" if turnover <= max_turn else ">",
+                           max_turn / 100)})
+        allowed = (not self.hold_mode) or (self.epoch - self.last_rebalance_epoch >= 3) \
+                  or turnover == 0
+        checks.append({"name": "single rebalance", "ok": allowed,
+                       "detail": "1 of 1 this epoch" if not self.hold_mode
+                       else "hold mode: one rebalance per 3 epochs"})
+        cash = target.get(CASH, 0)
+        checks.append({"name": "cash band", "ok": 0 <= cash <= 10000,
+                       "detail": "cash %.1f%% within 0–100%%" % (cash / 100)})
+        total = sum(target.values())
+        checks.append({"name": "weights sum", "ok": total == 10000,
+                       "detail": "sum %.2f%%" % (total / 100)})
+        checks.append({"name": "agent status", "ok": not self.frozen,
+                       "detail": "agent frozen — breaker active" if self.frozen
+                       else "agent active"})
+        return checks, turnover
+
+    def _agent_cycle(self):
+        rec = self.epochs[-1]                        # record of the epoch just closed
+        target = self._propose_weights()
+        weights_list = [target.get(a, 0) for a in WHITELIST] + [target.get(CASH, 0)]
+        thesis = self._make_thesis(target)
+        nonce = make_nonce(self.rng)
+        next_epoch = self.epoch + 1
+        h = commit_hash(next_epoch, weights_list, thesis, nonce)
+        self.track.append({"epoch": next_epoch, "hash": h, "revealed": False,
+                           "verified": False, "thesis": None,
+                           "committed_at": self.t, "revealed_at": None})
+        del self.track[:-40]
+        self._pending_commit = {"epoch": next_epoch, "weights_list": weights_list,
+                                "thesis": thesis, "nonce": nonce}
+        self.log("epoch %d decision sealed: %s…" % (next_epoch, h[:18]))
+        checks, turnover = self._guard_checks(target)
+        rec["checks"] = checks
+        rec["turnover_bps"] = turnover
+        failed = next((c for c in checks if not c["ok"]), None)
+        if failed:
+            rec["cancelled"] = failed["detail"]
+            self.log("epoch %d CANCELLED by MandateGuard: %s" %
+                     (next_epoch, failed["detail"]))
+            return
+        self._accepted_target = target
+        if self.phase >= 2 and turnover > 0:
+            rec["exec"] = self._execute(target, turnover)
+            rec["executed"] = True
+            self.last_rebalance_epoch = self.epoch
+
+    def _execute(self, target, turnover_bps):
+        nav = self.nav()
+        trades, max_imp, cost = [], 0, 0.0
+        for a in sorted(set(self.weights_bps()) | set(target)):
+            dv = nav * (target.get(a, 0) - self.weights_bps().get(a, 0)) / 10000.0
+            if abs(dv) < nav * 0.001 or a == CASH:
+                continue
+            impact = min(35, int(abs(dv) / nav * 10000 * 0.08) + self.rng.randrange(1, 6))
+            trades.append({"asset": a, "value": dv, "impact_bps": impact})
+            max_imp = max(max_imp, impact)
+            cost += abs(dv) * impact / 10000.0
+        nav_after = nav - cost
+        for a in self.positions:
+            tgt_v = nav_after * target.get(a, 0) / 10000.0
+            self.positions[a] = tgt_v / self.price_of(a)
+        self.log("batch executed: %d trades, max impact %d bps, cost %.2f USDG"
+                 % (len(trades), max_imp, cost))
+        return {"trades": trades, "max_impact_bps": max_imp, "cost": cost}
+
+    def _update_shadow(self):
+        if self.phase < 1:
+            return
+        if self._shadow_positions is None:
+            self._shadow_positions = dict(self.positions)
+        tgt = getattr(self, "_accepted_target", None)
+        snav = sum(self._shadow_positions[a] * self.price_of(a)
+                   for a in self._shadow_positions)
+        if tgt:
+            for a in set(self._shadow_positions) | set(tgt):
+                self._shadow_positions[a] = snav * tgt.get(a, 0) / 10000.0 \
+                                            / self.price_of(a)
+        self.shadow_uv.append(snav / self.units)
+        del self.shadow_uv[:-400]
+        self._accepted_target = None
 
     # ---- snapshot ----
     def snapshot(self):
