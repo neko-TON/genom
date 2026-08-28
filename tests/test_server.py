@@ -165,5 +165,62 @@ class TestSimSkeleton(unittest.TestCase):
         self.assertEqual(a.prices, b.prices)
 
 
+class TestAccrual(unittest.TestCase):
+    def setUp(self):
+        self.sim = server.Sim(seed=7)
+
+    def full_epochs(self, n):
+        for _ in range(n):
+            self.sim.advance(server.EPOCH_SIM - (self.sim.t - self.sim.epoch_start))
+
+    def holder(self, hid):
+        return next(h for h in self.sim.holders if h["id"] == hid)
+
+    def test_roster(self):
+        ids = {h["id"] for h in self.sim.holders}
+        self.assertIn("you", ids)
+        self.assertIn("sniper", ids)
+        self.assertGreaterEqual(len(ids), 7)
+        self.assertEqual(self.holder("you")["kind"], "user")
+        self.assertEqual(self.holder("sniper")["kind"], "sniper")
+
+    def test_sniper_share_is_dust(self):
+        self.full_epochs(3)
+        sniper = self.holder("sniper")
+        self.assertEqual(sniper["balance"], 0)          # exits after each close
+        self.assertLess(sniper["last_share"], 0.005)    # bought 12s before close
+        long_term = self.holder("whale")
+        self.assertGreater(long_term["last_share"], 0.1)
+
+    def test_trade_and_volume(self):
+        you = self.holder("you")
+        b0 = you["balance"]
+        self.sim.trade("buy", 100_000)
+        self.assertEqual(you["balance"], b0 + 100_000)
+        self.assertGreaterEqual(self.sim.volume_epoch, 100_000 * server.TOKEN_PRICE)
+        self.sim.trade("sell", 10 ** 12)                # clamped to balance
+        self.assertEqual(you["balance"], 0)
+
+    def test_claim_conservation(self):
+        self.full_epochs(5)
+        total_accrued = sum(h["claimable_value"] + h["claimed_value"]
+                            for h in self.sim.holders)
+        self.assertLessEqual(total_accrued, self.sim.pool80_total + 1e-6)
+        you = self.holder("you")
+        if you["claimable_value"] > 0:
+            nav0 = self.sim.nav()
+            paid = self.sim.claim()
+            self.assertAlmostEqual(you["claimable_value"], 0.0)
+            self.assertAlmostEqual(you["claimed_value"], paid)
+            self.assertAlmostEqual(self.sim.nav(), nav0 - paid, places=6)
+
+    def test_snapshot_holder_fields(self):
+        self.full_epochs(2)
+        h = self.sim.snapshot()["holders"][0]
+        for k in ("id", "name", "kind", "balance", "last_share",
+                  "claimable_value", "claimed_value"):
+            self.assertIn(k, h)
+
+
 if __name__ == "__main__":
     unittest.main()

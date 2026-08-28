@@ -138,6 +138,27 @@ class Sim:
         self.track = []
         self.gov_queue = []
         self.log_items = []
+        self.holders = [
+            {"id": "whale",   "name": "whale.eth",    "kind": "",       "balance": 120_000_000},
+            {"id": "meridian","name": "meridian.eth", "kind": "",       "balance": 40_000_000},
+            {"id": "w7a3f",   "name": "0x7a3f…c2d1",  "kind": "",       "balance": 25_000_000},
+            {"id": "kepler",  "name": "kepler.eth",   "kind": "",       "balance": 18_000_000},
+            {"id": "w94bb",   "name": "0x94bb…08aa",  "kind": "",       "balance": 12_000_000},
+            {"id": "aurora",  "name": "aurora.eth",   "kind": "",       "balance": 8_000_000},
+            {"id": "you",     "name": "you",          "kind": "user",   "balance": 2_000_000},
+            {"id": "sniper",  "name": "0xf00d…babe",  "kind": "sniper", "balance": 0},
+        ]
+        for h in self.holders:
+            h.update(integral=0.0, last_share=0.0,
+                     claimable_value=0.0, claimed_value=0.0)
+        self._supply_integral = 0.0
+        self._sniper_fired = False
+        self.volume_epoch = 0.0
+        self._base_flow = self.rng.uniform(200_000, 400_000)   # USDG volume per epoch
+        self.pool80_total = 0.0
+        self._tre_inflow_tax = 0.0
+        self._tre_inflow_creator = 0.0
+        self._tre_protocol = 0.0
         self.log("node online — passive index, phase 0")
 
     # ---- helpers ----
@@ -173,14 +194,60 @@ class Sim:
         remaining = dt_sim
         while remaining > 1e-9:
             boundary = self.epoch_start + EPOCH_SIM
-            step = min(remaining, boundary - self.t)
+            events = [boundary]
+            if not self._sniper_fired:
+                events.append(boundary - 12.0)
+            nxt = min(e for e in events if e > self.t + 1e-9)
+            step = min(remaining, nxt - self.t)
             self._integrate(step)
             remaining -= step
+            if not self._sniper_fired and self.t >= boundary - 12.0 - 1e-6:
+                self._sniper_buy()
             if self.t >= boundary - 1e-9:
                 self._close_epoch()
 
     def force_close(self):
         self._close_epoch()
+
+    def _sniper_buy(self):
+        self._sniper_fired = True
+        sniper = self._holder("sniper")
+        sniper["balance"] += 800_000
+        self.volume_epoch += 800_000 * TOKEN_PRICE
+        self.log("sniper bot bought 800k $NSTRO 12s before the close")
+
+    def _holder(self, hid):
+        return next(h for h in self.holders if h["id"] == hid)
+
+    def pending_quote(self):
+        return self.volume_epoch * 0.03 * 0.80
+
+    def trade(self, side, amount):
+        you = self._holder("you")
+        amount = float(amount)
+        if amount <= 0:
+            return
+        if side == "buy":
+            you["balance"] += amount
+        else:
+            amount = min(amount, you["balance"])
+            you["balance"] -= amount
+        self.volume_epoch += amount * TOKEN_PRICE
+        self.log("your wallet %s %s $NSTRO" % (
+            "bought" if side == "buy" else "sold", format(int(amount), ",")))
+
+    def claim(self):
+        you = self._holder("you")
+        paid = you["claimable_value"]
+        if paid <= 0:
+            return 0.0
+        you["claimable_value"] = 0.0
+        you["claimed_value"] += paid
+        scale = max(0.0, 1.0 - paid / self.nav())
+        for a in self.positions:
+            self.positions[a] *= scale
+        self.log("you claimed %.2f USDG" % paid)
+        return paid
 
     def _integrate(self, dt):
         self.t += dt
@@ -190,6 +257,17 @@ class Sim:
             mu, sg = self._drift[a], self._sigma[a]
             self.prices[a] *= math.exp((mu - 0.5 * sg * sg) * dt_days
                                        + sg * math.sqrt(dt_days) * g)
+        supply = 0.0
+        for h in self.holders:
+            h["integral"] += h["balance"] * dt
+            supply += h["balance"]
+        self._supply_integral += supply * dt
+        self.volume_epoch += self._base_flow * dt / EPOCH_SIM
+        if self.rng.random() < dt / 900.0:      # a bot trade every ~15 sim-min
+            bot = self.rng.choice(self.holders[:6])
+            delta = bot["balance"] * self.rng.uniform(-0.02, 0.02)
+            bot["balance"] = max(0.0, bot["balance"] + delta)
+            self.volume_epoch += abs(delta) * TOKEN_PRICE
 
     def _close_epoch(self):
         uv_now = self.unit_value()
@@ -213,7 +291,27 @@ class Sim:
             self.log("phase 2 — execution live at reduced limits")
 
     def _on_close(self):
-        pass  # extended in later tasks
+        tax = self.volume_epoch * 0.03
+        pool80 = tax * 0.80
+        self._tre_inflow_tax = tax * 0.13
+        self._tre_inflow_creator = self.volume_epoch * 0.01
+        self._tre_protocol += tax * 0.07
+        if self._supply_integral > 0:
+            for h in self.holders:
+                share = h["integral"] / self._supply_integral
+                h["last_share"] = share
+                h["claimable_value"] += share * pool80
+        self.pool80_total += pool80
+        self.positions[CASH] += pool80          # the basket buy (as cash inflow)
+        sniper = self._holder("sniper")
+        if sniper["balance"] > 0:
+            sniper["balance"] = 0
+            self.log("sniper exited right after the close — share ~0 (balance × time)")
+        for h in self.holders:
+            h["integral"] = 0.0
+        self._supply_integral = 0.0
+        self.volume_epoch = 0.0
+        self._sniper_fired = False
 
     # ---- snapshot ----
     def snapshot(self):
@@ -227,9 +325,14 @@ class Sim:
             "unit_values": list(self.uv) or [1.0],
             "shadow_uv": list(self.shadow_uv),
             "weights": self.weights_bps(), "prices": dict(self.prices),
-            "pending_quote": 0.0, "volume_epoch": 0.0,
+            "pending_quote": self.pending_quote(),
+            "volume_epoch": self.volume_epoch,
             "epochs": list(self.epochs), "track": list(self.track),
-            "holders": [], "treasury": {"runway_days": 0.0, "usdg": 0.0,
+            "holders": [{k: h[k] for k in ("id", "name", "kind", "balance",
+                                           "last_share", "claimable_value",
+                                           "claimed_value")}
+                        for h in self.holders],
+            "treasury": {"runway_days": 0.0, "usdg": 0.0,
                                         "epoch_cost": 0.0, "inflow_tax": 0.0,
                                         "inflow_creator": 0.0, "protocol_fund": 0.0,
                                         "hold_mode": False},
