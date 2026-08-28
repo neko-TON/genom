@@ -632,7 +632,8 @@ def rpc_call(url, method, params, timeout=4):
     payload = json.dumps({"jsonrpc": "2.0", "id": 1,
                           "method": method, "params": params}).encode()
     req = urllib.request.Request(url, data=payload,
-                                 headers={"Content-Type": "application/json"})
+                                 headers={"Content-Type": "application/json",
+                                         "User-Agent": "nstro-node/0.1"})
     try:
         with urllib.request.urlopen(req, timeout=timeout, context=_SSL_CTX) as r:
             out = json.loads(r.read())
