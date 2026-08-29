@@ -1,4 +1,4 @@
-/* NOSTRO CONSOLE — клиент локального узла */
+/* GENOM CONSOLE — клиент локального узла */
 (function () {
   "use strict";
 
@@ -91,7 +91,7 @@
 
   function renderBasketLive(B, R) {
     var head = document.querySelector("#cardBasket h2");
-    if (head) head.innerHTML = '<span class="cn mono">NostroBasket</span> Basket — actual positions on Uniswap v4';
+    if (head) head.innerHTML = '<span class="cn mono">GenomBasket</span> Basket — actual positions on Uniswap v4';
     var rows = (B.positions || []).map(function (p) {
       return { sym: p.symbol, amount: p.amount, value: p.amount * priceOf(p.symbol, R) };
     });
@@ -130,11 +130,11 @@
     var L = state.live || {};
     var known = {};
     if (L.pons && L.pons.curve) known[L.pons.curve.toLowerCase()] = "bonding curve · supply still unsold";
-    if (L.fee_vault) known[L.fee_vault.address.toLowerCase()] = "nostro fee vault";
-    if (L.basket) known[L.basket.address.toLowerCase()] = "nostro basket";
+    if (L.fee_vault) known[L.fee_vault.address.toLowerCase()] = "genom fee vault";
+    if (L.basket) known[L.basket.address.toLowerCase()] = "genom basket";
     var maxShare = Math.max.apply(null, R.holders.map(function (h) { return h.share; }).concat([0.0001]));
     $("holders").innerHTML = '<table class="h"><tr>' +
-      "<th>wallet</th><th class='r'>$NSTRO</th><th>epoch share</th><th class='r'>accrued ETH</th></tr>" +
+      "<th>wallet</th><th class='r'>$GENOM</th><th>epoch share</th><th class='r'>accrued ETH</th></tr>" +
       R.holders.map(function (h) {
         var barW = Math.max(2, h.share / maxShare * 90);
         var tag = known[h.id.toLowerCase()];
@@ -193,7 +193,7 @@
         "</div></div>";
     }).join("");
     return '<div style="margin-top:16px"><p class="foot mono" style="margin-bottom:8px">' +
-      'TRACK RECORD ON-CHAIN · each hash is an actual NostroCommits transaction</p>' +
+      'TRACK RECORD ON-CHAIN · each hash is an actual GenomCommits transaction</p>' +
       rows + "</div>";
   }
 
@@ -251,7 +251,7 @@
       cells += cell("token", shortAddr(L.vault));
       if (L.fee_vault) {
         var FV = L.fee_vault;
-        cells += cell("nostro vault · taken in", fmt(FV.total, 6) + " ETH") +
+        cells += cell("genom vault · taken in", fmt(FV.total, 6) + " ETH") +
           cell("basket 80%", fmt(FV.basket, 6)) +
           cell("agent ops 13%", fmt(FV.agent, 6)) +
           cell("protocol 7%", fmt(FV.protocol, 6)) +
@@ -505,7 +505,7 @@
     var rows = s.holders.slice().sort(function (a, b) { return b.balance - a.balance; });
     var maxShare = Math.max.apply(null, rows.map(function (h) { return h.last_share; }).concat([0.0001]));
     $("holders").innerHTML = '<table class="h"><tr>' +
-      "<th>wallet</th><th class='r'>$NSTRO</th><th>epoch share</th><th class='r'>accrued</th><th class='r'>claimed</th></tr>" +
+      "<th>wallet</th><th class='r'>$GENOM</th><th>epoch share</th><th class='r'>accrued</th><th class='r'>claimed</th></tr>" +
       rows.map(function (h) {
         var tag = h.kind === "user" ? '<span class="tag tag-you">you</span>'
           : h.kind === "sniper" ? '<span class="tag tag-bot">bot</span>' : "";
@@ -518,14 +518,14 @@
           "<td class='r'>" + fmt(h.claimable_value, 2) + "</td>" +
           "<td class='r'>" + fmt(h.claimed_value, 2) + "</td></tr>";
       }).join("") + "</table>" +
-      '<p class="foot">Twelve seconds before each close the sniper bot grabs 800k $NSTRO — and its share still approaches zero, because weight is balance × time.</p>';
+      '<p class="foot">Twelve seconds before each close the sniper bot grabs 800k $GENOM — and its share still approaches zero, because weight is balance × time.</p>';
   }
 
   function renderWallet(s) {
     var you = s.holders.find(function (h) { return h.id === "you"; });
     if (!you) return;
     $("wallet").innerHTML = '<div class="w-stats">' +
-      "<div><b>" + fmt(you.balance) + "</b><span>$NSTRO</span></div>" +
+      "<div><b>" + fmt(you.balance) + "</b><span>$GENOM</span></div>" +
       "<div><b>" + fmt(you.claimable_value, 2) + "</b><span>accrued · USDG</span></div>" +
       "<div><b>" + fmt(you.claimed_value, 2) + "</b><span>claimed · USDG</span></div></div>";
     var claimBtn = $("btnClaim");

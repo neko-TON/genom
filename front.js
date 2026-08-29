@@ -1,4 +1,4 @@
-/* NOSTRO front — digit-stream background + live node data */
+/* GENOM front — digit-stream background + live node data */
 (function () {
   "use strict";
 

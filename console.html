@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nostro Console — $NSTRO local node</title>
+<title>Genom Console — $GENOM local node</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,9 +23,9 @@
           <path d="M98.6 62 L185.2 112 L185.2 212"/>
         </g>
       </svg>
-      <span class="wordmark">NOSTRO<em>CONSOLE</em></span>
+      <span class="wordmark">GENOM<em>CONSOLE</em></span>
     </a>
-    <span class="pill mono">$NSTRO</span>
+    <span class="pill mono">$GENOM</span>
     <a href="index.html" class="navlink">front page</a>
   </div>
 
@@ -51,7 +51,7 @@
   <section class="card col-12" id="cardLive" hidden>
     <h2><span class="cn mono">on-chain</span> Contract currently attached <span class="mono lf-status ok" id="cfgStatus"></span></h2>
     <div id="liveInfo"></div>
-    <p class="foot mono">set up via the terminal: ./nstro connect &lt;vault&gt; [rpc] · ./nstro sim</p>
+    <p class="foot mono">set up via the terminal: ./genom connect &lt;vault&gt; [rpc] · ./genom sim</p>
   </section>
 
   <section class="card col-12" id="cardOnWallet" hidden>
@@ -75,7 +75,7 @@
         <p class="act-hint mono">buys and sells settle against the Pons bonding curve · 1% fee</p>
       </div>
       <div class="act-box">
-        <p class="act-t mono">TOP UP THE NOSTRO VAULT</p>
+        <p class="act-t mono">TOP UP THE GENOM VAULT</p>
         <div class="act-row">
           <input id="feedEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="amount of ETH to send">
           <button class="act act-ice" id="btnFeed">push ETH fees in</button>
@@ -91,7 +91,7 @@
   </section>
 
   <section class="card col-7" id="cardBasket">
-    <h2><span class="cn mono">NostroVault</span> The basket</h2>
+    <h2><span class="cn mono">GenomVault</span> The basket</h2>
     <div id="basket"></div>
     <p class="foot mono" id="basketFoot"></p>
   </section>
@@ -114,7 +114,7 @@
     <h2><span class="cn mono">your wallet</span> Holdings & claiming</h2>
     <div id="wallet"></div>
     <div class="wallet-btns">
-      <input id="tradeAmt" class="amt mono" type="number" value="100000" min="0" step="10000" aria-label="$NSTRO amount to trade">
+      <input id="tradeAmt" class="amt mono" type="number" value="100000" min="0" step="10000" aria-label="$GENOM amount to trade">
       <button class="act" data-trade="buy">buy</button>
       <button class="act" data-trade="sell">sell</button>
       <button class="act act-ice" id="btnClaim">claim</button>
@@ -149,7 +149,7 @@
 </main>
 
 <footer class="bottom mono">
-  Nostro Agent · a full-cycle local simulation of concept v0.1 · real keccak256 + abi.encode ·
+  Genom Agent · a full-cycle local simulation of concept v0.1 · real keccak256 + abi.encode ·
   this node emulates Robinhood Chain / Pons V2 / Uniswap V4
 </footer>
 
