@@ -170,7 +170,7 @@
           "</p>");
   }
 
-  /* ---------- live chain (configured via ./nstro CLI) ---------- */
+  /* ---------- live chain (configured via ./genom CLI) ---------- */
   function shortAddr(a) {
     return a && a.length > 12 ? a.slice(0, 8) + "…" + a.slice(-6) : (a || "—");
   }
