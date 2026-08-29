@@ -345,7 +345,7 @@ section[id] { scroll-margin-top: 40px; }
 @media (prefers-reduced-motion: no-preference) {
   .type-caret { animation: caret-blink 1.1s steps(1) infinite; }
 }
-@media (prefers-reduced-motion: reduce) { .type-caret { display: none; } }
+@media (prefers-reduced-motion: reduce) { .hero-in h1 span.type-caret, .type-caret { display: none; } }
 @keyframes caret-blink { 50% { opacity: 0; } }
 
 .seq-rule { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
