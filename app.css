@@ -16,6 +16,9 @@
   --fd: "Unbounded", sans-serif;
   --ft: "Inter", sans-serif;
   --fm: "JetBrains Mono", monospace;
+  --glow-g:  0 0 22px rgba(99, 245, 166, .24);
+  --glow-gs: 0 0 14px rgba(99, 245, 166, .38);
+  --glow-uv: 0 0 16px rgba(157, 123, 255, .40);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -258,3 +261,11 @@ a.act { text-decoration: none; display: inline-block; }
   .b-row { grid-template-columns: 74px 1fr 80px; }
   .b-p { display: none; }
 }
+
+/* ---------- sequencer glow (console) ---------- */
+.wordmark { text-shadow: var(--glow-g); }
+.wordmark em { text-shadow: var(--glow-uv); }
+.cn { text-shadow: var(--glow-gs); }
+.cn::before { content: "\25B8  "; color: rgba(157, 123, 255, .95); text-shadow: var(--glow-uv); }
+.top-stats b { text-shadow: var(--glow-gs); }
+.pill { text-shadow: var(--glow-gs); }
