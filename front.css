@@ -206,13 +206,13 @@ section[id] { scroll-margin-top: 40px; }
 .proof-side > p { color: var(--dim); font-size: 15px; line-height: 1.75; max-width: 460px; }
 .proof-side .btn { align-self: flex-start; }
 .mini { display: flex; flex-direction: column; gap: 8px; }
-.mb-row { display: grid; grid-template-columns: 56px 1fr 56px; gap: 12px; align-items: center; }
-.mb-t { font-size: 11px; color: var(--ice); letter-spacing: .08em; }
+.mb-row { display: grid; grid-template-columns: 76px 1fr 56px; gap: 12px; align-items: center; }
+.mb-t { display: flex; align-items: center; white-space: nowrap; font-size: 11px; color: var(--ice); letter-spacing: .08em; }
 .mb-bar { height: 6px; background: rgba(99,245,166,.08); }
 .mb-fill { height: 100%; background: var(--ice); transition: width .8s cubic-bezier(.22,.61,.36,1); }
 .mb-fill.cash { background: var(--good); }
 .mb-w { font-size: 11px; color: var(--mute); text-align: right; }
-.tkr-ico { width: 12px; height: 12px; vertical-align: -2px; margin-right: 5px; opacity: .8; }
+.tkr-ico { flex: none; width: 12px; height: 12px; vertical-align: -2px; margin-right: 5px; opacity: .8; }
 
 /* worst */
 .worst { display: grid; grid-template-columns: repeat(3, 1fr); gap: 44px; }
