@@ -158,6 +158,22 @@
     start();
   })();
 
+  /* ============ hero ghost parallax ============ */
+  (function parallax() {
+    if (REDUCED) return;
+    var ghost = document.querySelector(".hero-ghost");
+    if (!ghost) return;
+    var ticking = false;
+    window.addEventListener("scroll", function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ghost.style.transform = "translateY(" + (window.scrollY * 0.08) + "px)";
+        ticking = false;
+      });
+    }, { passive: true });
+  })();
+
   /* ============ reveal ============ */
   var rvEls = document.querySelectorAll(".rv");
   if ("IntersectionObserver" in window && !REDUCED) {
@@ -318,12 +334,34 @@
     }
   }
 
+  var COUNTED = false;
+  function countUp(el, target, render) {
+    var t0 = null;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min(1, (ts - t0) / 800);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = render(target * eased);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
   function tick() {
     fetch("/api/state").then(function (r) { return r.json(); }).then(function (s) {
-      $("stEpoch").textContent = s.epoch;
-      $("stNav").textContent = fmt(s.nav);
-      $("stUnit").textContent = s.unit_value.toFixed(4);
-      $("stRun").textContent = fmt(s.treasury.runway_days, 0);
+      var noSimEarly = s.mode === "live" || s.public;
+      if (!COUNTED && !noSimEarly && !REDUCED) {
+        COUNTED = true;
+        countUp($("stEpoch"), s.epoch, function (v) { return Math.round(v); });
+        countUp($("stNav"), s.nav, function (v) { return fmt(v); });
+        countUp($("stUnit"), s.unit_value, function (v) { return v.toFixed(4); });
+        countUp($("stRun"), s.treasury.runway_days, function (v) { return fmt(v, 0); });
+      } else if (COUNTED || noSimEarly || REDUCED) {
+        $("stEpoch").textContent = s.epoch;
+        $("stNav").textContent = fmt(s.nav);
+        $("stUnit").textContent = s.unit_value.toFixed(4);
+        $("stRun").textContent = fmt(s.treasury.runway_days, 0);
+      }
       $("stPhase").textContent = s.phase;
       var noSim = s.mode === "live" || s.public;
       if (!TAPE_BUILT && !noSim) buildTape(s);
