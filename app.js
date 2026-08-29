@@ -91,7 +91,7 @@
 
   function renderBasketLive(B, R) {
     var head = document.querySelector("#cardBasket h2");
-    if (head) head.innerHTML = '<span class="cn mono">NostroBasket</span> Basket — real holdings on Uniswap v4';
+    if (head) head.innerHTML = '<span class="cn mono">NostroBasket</span> Basket — actual positions on Uniswap v4';
     var rows = (B.positions || []).map(function (p) {
       return { sym: p.symbol, amount: p.amount, value: p.amount * priceOf(p.symbol, R) };
     });
@@ -112,24 +112,24 @@
       return k + " " + (R.weights[k] / 100).toFixed(0) + "%";
     }).join(" · ") : "";
     $("basketFoot").textContent =
-      "NAV ≈ " + fmt(nav, 4) + " USDG · agent target: " + (tgt || "—");
+      "NAV ≈ " + fmt(nav, 4) + " USDG · the agent's target: " + (tgt || "—");
   }
 
   function renderChartLive(R) {
     var head = document.querySelector("#cardChart h2");
-    if (head) head.innerHTML = '<span class="cn mono">NAV</span> Unit value — real prices, real epochs';
+    if (head) head.innerHTML = '<span class="cn mono">NAV</span> Unit value — genuine prices, genuine epochs';
     drawChart(R.uv, null);
     var lg = document.querySelector("#cardChart .legend");
-    if (lg) lg.innerHTML = '<span><i class="sw sw-fact"></i>unit value since epoch 1 (' +
+    if (lg) lg.innerHTML = '<span><i class="sw sw-fact"></i>unit value from epoch 1 (' +
       R.uv.length + " epochs)</span>";
   }
 
   function renderHoldersLive(R) {
     var head = document.querySelector("#cardHolders h2");
-    if (head) head.innerHTML = '<span class="cn mono">weight × time</span> Holders — indexed from Transfer logs';
+    if (head) head.innerHTML = '<span class="cn mono">weight × time</span> Holders — built from Transfer logs';
     var L = state.live || {};
     var known = {};
-    if (L.pons && L.pons.curve) known[L.pons.curve.toLowerCase()] = "bonding curve · unsold supply";
+    if (L.pons && L.pons.curve) known[L.pons.curve.toLowerCase()] = "bonding curve · supply still unsold";
     if (L.fee_vault) known[L.fee_vault.address.toLowerCase()] = "nostro fee vault";
     if (L.basket) known[L.basket.address.toLowerCase()] = "nostro basket";
     var maxShare = Math.max.apply(null, R.holders.map(function (h) { return h.share; }).concat([0.0001]));
@@ -151,12 +151,12 @@
           "<span class='mono' style='font-size:11px'>" + (h.share * 100).toFixed(2) + "%</span></td>" +
           "<td class='r'>" + fmt(h.claimable, 8) + "</td></tr>";
       }).join("") + "</table>" +
-      '<p class="foot">Shares accrue as balance × holding time, indexed straight from on-chain Transfer events.</p>';
+      '<p class="foot">Shares build up as balance × time held, derived directly from on-chain Transfer events.</p>';
   }
 
   function renderGuardLive(R) {
     var head = document.querySelector("#cardGuard h2");
-    if (head) head.innerHTML = '<span class="cn mono">MandateGuard</span> Latest vector check — epoch ' + (R.last.n + 1);
+    if (head) head.innerHTML = '<span class="cn mono">MandateGuard</span> Freshest vector check — epoch ' + (R.last.n + 1);
     var e = R.last;
     $("guard").innerHTML = e.checks.map(function (c) {
       return '<div class="g-row ' + (c.ok ? "g-ok" : "g-bad") + '">' +
@@ -164,9 +164,9 @@
         '<span class="g-detail">' + esc(c.detail) + "</span></div>";
     }).join("") +
       (e.cancelled
-        ? '<p class="g-cancel">epoch cancelled: ' + esc(e.cancelled) + "</p>"
-        : '<p class="foot">vector accepted' +
-          (e.executed ? " and executed on-chain via Uniswap v4" : " · sealed, no trade needed") +
+        ? '<p class="g-cancel">epoch voided: ' + esc(e.cancelled) + "</p>"
+        : '<p class="foot">vector cleared' +
+          (e.executed ? " and carried out on-chain via Uniswap v4" : " · sealed; no trade was required") +
           "</p>");
   }
 
@@ -179,21 +179,21 @@
     if (!CM || !CM.records || !CM.records.length) return "";
     var rows = CM.records.slice(0, 6).map(function (r) {
       var badge = r.failed
-        ? '<span class="t-badge t-fail">mismatch — failed</span>'
+        ? '<span class="t-badge t-fail">hashes disagree — failed</span>'
         : r.revealed
-          ? '<span class="t-badge t-ok">keccak verified</span>'
-          : '<span class="t-badge t-sealed">thesis sealed</span>';
+          ? '<span class="t-badge t-ok">keccak checked</span>'
+          : '<span class="t-badge t-sealed">thesis under seal</span>';
       var link = "https://robinhoodchain.blockscout.com/address/" + CM.address;
       return '<div class="t-item"><div class="t-head">' +
         '<span class="t-ep">E-' + r.epoch + "</span>" +
         '<a class="t-hash" target="_blank" rel="noopener" href="' + link + '">' +
         r.hash.slice(0, 22) + "…" + r.hash.slice(-8) + "</a>" + badge + "</div>" +
         '<div class="t-meta">commit ' + simDay(r.committed_at) +
-        (r.revealed_at ? " → reveal " + simDay(r.revealed_at) : " · on-chain, awaiting reveal") +
+        (r.revealed_at ? " → reveal " + simDay(r.revealed_at) : " · on-chain, reveal pending") +
         "</div></div>";
     }).join("");
     return '<div style="margin-top:16px"><p class="foot mono" style="margin-bottom:8px">' +
-      'ON-CHAIN TRACK RECORD · every hash is a real transaction in NostroCommits</p>' +
+      'TRACK RECORD ON-CHAIN · each hash is an actual NostroCommits transaction</p>' +
       rows + "</div>";
   }
 
@@ -204,7 +204,7 @@
     if (s.mode !== "live") {
       if (s.public) {
         st.className = "mono lf-status";
-        st.textContent = "standby — the token address has not been connected yet";
+        st.textContent = "standby — no token address attached yet";
         box.innerHTML = "";
       } else {
         box.innerHTML = "";
@@ -212,15 +212,15 @@
       return;
     }
     var L = s.live;
-    if (!L) { st.className = "mono lf-status"; st.textContent = "connecting…"; return; }
+    if (!L) { st.className = "mono lf-status"; st.textContent = "linking up…"; return; }
     if (!L.ok) {
       st.className = "mono lf-status err";
-      st.textContent = L.error || "chain unreachable";
+      st.textContent = L.error || "chain out of reach";
       box.innerHTML = "";
       return;
     }
     st.className = "mono lf-status ok";
-    st.textContent = (L.kind === "token" ? "watching the launch token" : "reading the vault") + " every 4s";
+    st.textContent = (L.kind === "token" ? "tracking the launch token" : "polling the vault") + " every 4s";
     function cell(k, v) {
       return '<div class="live-cell"><span>' + k + "</span><b>" + v + "</b></div>";
     }
@@ -232,18 +232,18 @@
       cell("total supply", supply);
     if (L.kind === "token") {
       var P = L.pons || {};
-      if (P.registered != null) cells += cell("pons factory", P.registered ? "registered" : "not found");
+      if (P.registered != null) cells += cell("pons factory", P.registered ? "on record" : "absent");
       if (P.graduated) {
         cells += cell("status", '<span style="color:var(--good)">GRADUATED — UNISWAP V4</span>');
-        cells += cell("curve", "100% — pool is live, LP locked");
+        cells += cell("curve", "100% — the pool is live and LP is locked");
       } else if (P.phase_label) {
         cells += cell("status", P.phase_label);
       }
       if (!P.graduated && P.progress_pct != null) cells += cell("curve progress", P.progress_pct + "%" +
         (P.graduation_threshold ? " of " + fmt(P.graduation_threshold, 2) : ""));
-      if (!P.graduated && P.ready != null) cells += cell("ready to graduate", P.ready ? "YES" : "no");
+      if (!P.graduated && P.ready != null) cells += cell("graduation ready", P.ready ? "YES" : "no");
       if (P.pair) cells += cell("pair", P.pair === "ETH" ? "ETH" : shortAddr(P.pair));
-      if (P.fees_accrued != null) cells += cell("creator fees accrued",
+      if (P.fees_accrued != null) cells += cell("creator fees piled up",
         fmt(P.fees_accrued, 5) + " " + (P.fees_asset === "ETH" ? "ETH" : "(pair)"));
       if (P.fee_bps != null) cells += cell("pool fee", (P.fee_bps / 100) + "%");
       if (P.creator_tax_bps != null) cells += cell("creator tax", (P.creator_tax_bps / 100) + "%");
@@ -251,7 +251,7 @@
       cells += cell("token", shortAddr(L.vault));
       if (L.fee_vault) {
         var FV = L.fee_vault;
-        cells += cell("nostro vault · received", fmt(FV.total, 6) + " ETH") +
+        cells += cell("nostro vault · taken in", fmt(FV.total, 6) + " ETH") +
           cell("basket 80%", fmt(FV.basket, 6)) +
           cell("agent ops 13%", fmt(FV.agent, 6)) +
           cell("protocol 7%", fmt(FV.protocol, 6)) +
@@ -268,8 +268,8 @@
       if (L.basket) cells += cell("basket address", shortAddr(L.basket.address));
       box.innerHTML = '<div class="live-grid">' + cells + "</div>" +
         '<div class="gov-btns" style="margin-top:14px">' +
-        '<a class="act act-ice" target="_blank" rel="noopener" href="https://ponsfamily.com/' + L.vault + '">trade on pons ↗</a>' +
-        '<a class="act" target="_blank" rel="noopener" href="https://robinhoodchain.blockscout.com/token/' + L.vault + '">explorer ↗</a>' +
+        '<a class="act act-ice" target="_blank" rel="noopener" href="https://ponsfamily.com/' + L.vault + '">swap on pons ↗</a>' +
+        '<a class="act" target="_blank" rel="noopener" href="https://robinhoodchain.blockscout.com/token/' + L.vault + '">block explorer ↗</a>' +
         "</div>" + commitsTrack(L.commits);
       return;
     }
@@ -291,12 +291,12 @@
     if (s.mode === "live" || s.public) {
       $("topStats").innerHTML =
         '<span class="mode-tag ' + (s.mode === "live" ? "live" : "sim") + '">' +
-        (s.mode === "live" ? "LIVE ON-CHAIN" : "STANDBY") + "</span>" +
+        (s.mode === "live" ? "ON-CHAIN · LIVE" : "ON STANDBY") + "</span>" +
         (s.mode === "live" && s.live && s.live.ok
           ? "<span>chain <b>" + s.live.chain_id + "</b></span>" +
             "<span>block <b>" + fmt(s.live.block) + "</b></span>" +
             "<span><b>" + (s.live.symbol || "—") + "</b></span>"
-          : "<span>waiting for the token address</span>");
+          : "<span>awaiting a token address</span>");
       $("epochProgress").style.width = "0%";
       return;
     }
@@ -329,12 +329,12 @@
     if (s.mode === "live" || s.public) { $("alerts").innerHTML = ""; return; }
     var html = "";
     if (s.guard.frozen) {
-      html += '<div class="alert alert-bad">BREAKER: drawdown exceeded −25% over 7 epochs — agent frozen since epoch ' +
-        s.guard.freeze_epoch + ", basket moved to USDG. Unlock requires a vote." +
-        ' <button onclick="NC.gov(\'unfreeze\')">vote to unfreeze</button></div>';
+      html += '<div class="alert alert-bad">BREAKER: the drawdown passed −25% within 7 epochs — the agent has been frozen since epoch ' +
+        s.guard.freeze_epoch + " and the basket now sits in USDG. Only a vote can unlock it." +
+        ' <button onclick="NC.gov(\'unfreeze\')">cast an unfreeze vote</button></div>';
     }
     if (s.treasury.hold_mode) {
-      html += '<div class="alert alert-warn">Runway under 14 days: hold mode — one rebalance every three days.</div>';
+      html += '<div class="alert alert-warn">Less than 14 days of runway: hold mode — rebalancing only once every three days.</div>';
     }
     $("alerts").innerHTML = html;
   }
@@ -356,8 +356,8 @@
         '<span class="b-p">' + fmt(s.prices[a], 2) + "</span></div>";
     }).join("");
     $("basketFoot").textContent =
-      "tax queued for the batch buy: " + fmt(s.pending_quote, 2) +
-      " USDG · epoch volume: " + fmt(s.volume_epoch) + " USDG";
+      "tax waiting for the batch purchase: " + fmt(s.pending_quote, 2) +
+      " USDG · volume this epoch: " + fmt(s.volume_epoch) + " USDG";
   }
 
   function renderChart(s) {
@@ -420,7 +420,7 @@
   function trackDetails(r, submitted) {
     var out = '<div class="t-details">';
     if (submitted && submitted.checks && submitted.checks.length) {
-      out += "<h4>MandateGuard · vector check at submission</h4>";
+      out += "<h4>MandateGuard · check performed at submission</h4>";
       out += submitted.checks.map(function (c) {
         return '<div class="g-row ' + (c.ok ? "g-ok" : "g-bad") + '">' +
           '<span class="g-dot"></span><span class="g-name">' + esc(c.name) + "</span>" +
@@ -429,14 +429,14 @@
       out += '<div class="t-meta">turnover ' + (submitted.turnover_bps / 100).toFixed(1) + "% NAV</div>";
     }
     if (submitted && submitted.exec && submitted.exec.trades && submitted.exec.trades.length) {
-      out += "<h4>Executor · batch (" + submitted.exec.max_impact_bps + " bps max impact, cost " +
-        fmt(submitted.exec.cost, 2) + " USDG)</h4>";
+      out += "<h4>Executor · batch (" + submitted.exec.max_impact_bps + " bps of max impact, " +
+        fmt(submitted.exec.cost, 2) + " USDG in costs)</h4>";
       out += submitted.exec.trades.map(function (t) {
         return '<div class="t-trade"><span>' + t.asset + "</span><b>" +
           (t.value >= 0 ? "+" : "") + fmt(t.value, 0) + " USDG · " + t.impact_bps + " bps</b></div>";
       }).join("");
     } else if (submitted && !submitted.cancelled && submitted.phase < 2) {
-      out += '<div class="t-meta">shadow phase — no execution</div>';
+      out += '<div class="t-meta">shadow phase — nothing is executed</div>';
     }
     return out + "</div>";
   }
@@ -447,10 +447,10 @@
     var items = s.track.slice().reverse().slice(0, 8);
     $("track").innerHTML = items.map(function (r) {
       var badge = !r.revealed
-        ? '<span class="t-badge t-sealed">thesis sealed</span>'
+        ? '<span class="t-badge t-sealed">thesis under seal</span>'
         : r.verified
-          ? '<span class="t-badge t-ok">keccak verified</span>'
-          : '<span class="t-badge t-fail">mismatch — failed</span>';
+          ? '<span class="t-badge t-ok">keccak checked</span>'
+          : '<span class="t-badge t-fail">hashes disagree — failed</span>';
       var e = dnav[r.epoch];
       var d = e ? '<span class="t-dnav" style="color:' +
         (e.dnav_pct >= 0 ? "var(--good)" : "var(--bad)") + '">' +
@@ -458,7 +458,7 @@
       // the vector for epoch N is submitted at the close of N−1 — cancellation lives there
       var submitted = dnav[r.epoch - 1];
       var cancelled = submitted && submitted.cancelled
-        ? '<div class="t-meta" style="color:var(--warn)">epoch cancelled: ' + esc(submitted.cancelled) + "</div>" : "";
+        ? '<div class="t-meta" style="color:var(--warn)">epoch voided: ' + esc(submitted.cancelled) + "</div>" : "";
       var open = !!openEpochs[r.epoch];
       return '<div class="t-item" data-ep="' + r.epoch + '"><div class="t-head">' +
         '<span class="t-ep">E-' + r.epoch + "</span>" +
@@ -467,11 +467,11 @@
         badge + d + "</div>" +
         (r.thesis ? '<div class="t-thesis">' + esc(r.thesis) + "</div>" : "") +
         '<div class="t-meta">commit ' + simDay(r.committed_at) +
-        (r.revealed_at ? " → reveal " + simDay(r.revealed_at) : " · trade → reveal next epoch") +
+        (r.revealed_at ? " → reveal " + simDay(r.revealed_at) : " · trade → unsealed next epoch") +
         "</div>" + cancelled +
         (open ? trackDetails(r, submitted) : "") +
         "</div>";
-    }).join("") || '<p class="foot">the agent has not submitted a vector yet (phase 0)</p>';
+    }).join("") || '<p class="foot">no vector has come from the agent so far (phase 0)</p>';
   }
 
   document.getElementById("track").addEventListener("click", function (e) {
@@ -488,17 +488,17 @@
       if (s.epochs[i].checks && s.epochs[i].checks.length) { last = s.epochs[i]; break; }
     }
     var lim = s.guard.limits;
-    var head = '<p class="g-lim">phase ' + s.phase + " limits: weight ≤ " +
+    var head = '<p class="g-lim">limits in phase ' + s.phase + ": weight ≤ " +
       lim.max_weight_bps / 100 + "% · turnover ≤ " + lim.turnover_bps / 100 + "% NAV</p>";
-    if (!last) { $("guard").innerHTML = head + '<p class="foot">no checks yet</p>'; return; }
+    if (!last) { $("guard").innerHTML = head + '<p class="foot">nothing checked yet</p>'; return; }
     $("guard").innerHTML = head + last.checks.map(function (c) {
       return '<div class="g-row ' + (c.ok ? "g-ok" : "g-bad") + '">' +
         '<span class="g-dot"></span><span class="g-name">' + esc(c.name) + "</span>" +
         '<span class="g-detail">' + esc(c.detail) + "</span></div>";
     }).join("") +
-      (last.cancelled ? '<p class="g-cancel">Epoch ' + (last.n + 1) + " cancelled: " + esc(last.cancelled) + "</p>"
-        : '<p class="foot">vector for epoch ' + (last.n + 1) + " accepted" +
-          (last.executed ? " and executed in one batch" : s.phase < 2 ? " (shadow, no execution)" : "") + "</p>");
+      (last.cancelled ? '<p class="g-cancel">Epoch ' + (last.n + 1) + " voided: " + esc(last.cancelled) + "</p>"
+        : '<p class="foot">vector for epoch ' + (last.n + 1) + " cleared" +
+          (last.executed ? " and run as a single batch" : s.phase < 2 ? " (shadow — not executed)" : "") + "</p>");
   }
 
   function renderHolders(s) {
@@ -518,7 +518,7 @@
           "<td class='r'>" + fmt(h.claimable_value, 2) + "</td>" +
           "<td class='r'>" + fmt(h.claimed_value, 2) + "</td></tr>";
       }).join("") + "</table>" +
-      '<p class="foot">The sniper bot buys 800k $NSTRO twelve seconds before every close — its share tends to zero: weight is balance × time.</p>';
+      '<p class="foot">Twelve seconds before each close the sniper bot grabs 800k $NSTRO — and its share still approaches zero, because weight is balance × time.</p>';
   }
 
   function renderWallet(s) {
@@ -535,13 +535,13 @@
   function renderTreasury(s) {
     var t = s.treasury;
     $("treasury").innerHTML =
-      '<div class="tr-run"><b>' + fmt(t.runway_days, 1) + "</b><span>days of runway" +
+      '<div class="tr-run"><b>' + fmt(t.runway_days, 1) + "</b><span>runway, days" +
       (t.hold_mode ? ' <span class="badge-hold">hold mode</span>' : "") + "</span></div>" +
       '<div class="kv"><span>USDG balance</span><b>' + fmt(t.usdg, 2) + "</b></div>" +
-      '<div class="kv"><span>Cost per epoch (inference + gas)</span><b>' + fmt(t.epoch_cost, 0) + "</b></div>" +
-      '<div class="kv"><span>Inflow: 13% of the tax</span><b>' + fmt(t.inflow_tax, 2) + "</b></div>" +
-      '<div class="kv"><span>Inflow: 1% creator fees</span><b>' + fmt(t.inflow_creator, 2) + "</b></div>" +
-      '<div class="kv"><span>Protocol fund (7%)</span><b>' + fmt(t.protocol_fund, 2) + "</b></div>";
+      '<div class="kv"><span>Per-epoch cost (inference + gas)</span><b>' + fmt(t.epoch_cost, 0) + "</b></div>" +
+      '<div class="kv"><span>Incoming: the tax\'s 13%</span><b>' + fmt(t.inflow_tax, 2) + "</b></div>" +
+      '<div class="kv"><span>Incoming: 1% creator fees</span><b>' + fmt(t.inflow_creator, 2) + "</b></div>" +
+      '<div class="kv"><span>Protocol pot (7%)</span><b>' + fmt(t.protocol_fund, 2) + "</b></div>";
   }
 
   function renderGov(s) {
@@ -552,19 +552,19 @@
     }).join("");
     var queue = s.gov_queue.length
       ? s.gov_queue.map(function (g) {
-          return '<div class="gq">' + esc(g.label) + " — <b>timelock until epoch " + g.eta + "</b></div>";
+          return '<div class="gq">' + esc(g.label) + " — <b>locked until epoch " + g.eta + "</b></div>";
         }).join("")
-      : '<div class="gq">queue is empty</div>';
+      : '<div class="gq">nothing in the queue</div>';
     var btns = "";
     if (s.phase === 2 && !s.gov_queue.some(function (g) { return g.action === "phase3"; })) {
-      btns += '<button class="act" onclick="NC.gov(\'phase3\')">vote: phase 3</button>';
+      btns += '<button class="act" onclick="NC.gov(\'phase3\')">vote for phase 3</button>';
     }
     if (s.guard.frozen && !s.gov_queue.some(function (g) { return g.action === "unfreeze"; })) {
-      btns += '<button class="act" onclick="NC.gov(\'unfreeze\')">vote: unfreeze</button>';
+      btns += '<button class="act" onclick="NC.gov(\'unfreeze\')">vote to unfreeze</button>';
     }
     $("gov").innerHTML = '<div class="ph-steps">' + steps + "</div>" + queue +
       (btns ? '<div class="gov-btns">' + btns + "</div>" : "") +
-      '<p class="foot">Every change is a holder vote plus a 3-day timelock (3 epochs). Three days for dissenters to exit.</p>';
+      '<p class="foot">Any change takes a holder vote and a 3-day timelock (3 epochs) — three days in which dissenters can leave.</p>';
   }
 
   function renderLog(s) {
@@ -640,7 +640,7 @@
 
   function connectWallet() {
     if (!window.ethereum) {
-      alert("No wallet extension found. Install MetaMask / Rabby and reload.");
+      alert("No wallet extension detected. Add MetaMask / Rabby and reload the page.");
       return;
     }
     // wallet_requestPermissions форсит пикер аккаунтов при каждом клике;
@@ -678,19 +678,19 @@
   }
 
   function sendTx(tx, label) {
-    if (!W3.account) { actStatus("err", "connect a wallet first"); return; }
-    actStatus("", label + " — confirm in your wallet…");
+    if (!W3.account) { actStatus("err", "attach a wallet first"); return; }
+    actStatus("", label + " — approve it in your wallet…");
     ensureChain()
       .then(function () {
         tx.from = W3.account;
         return ethReq("eth_sendTransaction", [tx]);
       })
       .then(function (hash) {
-        actStatus("ok", label + " sent: " + txLink(hash));
+        actStatus("ok", label + " dispatched: " + txLink(hash));
         setTimeout(refreshOnWallet, 4000);
       })
       .catch(function (e) {
-        actStatus("err", label + " failed: " + ((e && e.message) || "rejected"));
+        actStatus("err", label + " did not go through: " + ((e && e.message) || "declined"));
       });
   }
 
@@ -700,20 +700,20 @@
 
   function doBuy() {
     var curve = curveAddr();
-    if (!curve) { actStatus("err", "no curve — token may have graduated"); return; }
+    if (!curve) { actStatus("err", "curve missing — the token has likely graduated"); return; }
     var eth = $("buyEth").value;
     var wei = toWeiHex(eth);
     // buy(quoteIn, minTokensOut=0, recipient=you)
     var data = SEL.buy + num32(wei) + num32("0x0") + num32(W3.account);
-    sendTx({ to: curve, value: wei, data: data }, "buy " + eth + " ETH");
+    sendTx({ to: curve, value: wei, data: data }, "buy for " + eth + " ETH");
   }
   function doSell() {
     var curve = curveAddr();
-    if (!curve) { actStatus("err", "no curve — token may have graduated"); return; }
+    if (!curve) { actStatus("err", "curve missing — the token has likely graduated"); return; }
     var token = state.live.vault;
     var amt = toWeiHex($("sellTok").value);
     // сначала approve кривой, потом sell
-    actStatus("", "approve curve → sell (two signatures)…");
+    actStatus("", "approve the curve, then sell (two signatures)…");
     ensureChain().then(function () {
       return ethReq("eth_sendTransaction", [{
         from: W3.account, to: token,
@@ -722,22 +722,22 @@
       var data = SEL.sell + num32(amt) + num32("0x0") + num32(W3.account);
       return ethReq("eth_sendTransaction", [{ from: W3.account, to: curve, data: data }]);
     }).then(function (hash) {
-      actStatus("ok", "sell sent: " + txLink(hash));
+      actStatus("ok", "sell dispatched: " + txLink(hash));
       setTimeout(refreshOnWallet, 4000);
     }).catch(function (e) {
-      actStatus("err", "sell failed: " + ((e && e.message) || "rejected"));
+      actStatus("err", "sell did not go through: " + ((e && e.message) || "declined"));
     });
   }
   function doFeed() {
     var eth = $("feedEth").value;
-    sendTx({ to: FEE_VAULT, value: toWeiHex(eth) }, "feed " + eth + " ETH to vault");
+    sendTx({ to: FEE_VAULT, value: toWeiHex(eth) }, "top up vault with " + eth + " ETH");
   }
   function doProcessWeth() {
     sendTx({ to: FEE_VAULT, data: SEL.processWeth }, "processWETH");
   }
   function doBurn() {
-    var t = prompt("Token address to burn from the vault (0x…):");
-    if (!t || !/^0x[0-9a-fA-F]{40}$/.test(t)) { actStatus("err", "bad address"); return; }
+    var t = prompt("Which token should the vault burn (0x… address):");
+    if (!t || !/^0x[0-9a-fA-F]{40}$/.test(t)) { actStatus("err", "address is invalid"); return; }
     sendTx({ to: FEE_VAULT, data: SEL.burnToken + num32(t) }, "burn token");
   }
 
@@ -754,21 +754,21 @@
     if (!el) return;
     var c = W3.claims;
     if (!c || !c.rounds || !c.rounds.length) {
-      el.innerHTML = '<p class="foot">Nothing distributed to this wallet yet. ' +
-        'Rewards accrue as balance × time and are published on-chain each epoch.</p>';
+      el.innerHTML = '<p class="foot">This wallet has received no distributions so far. ' +
+        'Rewards build up as balance × time and go on-chain every epoch.</p>';
       return;
     }
     var open = c.rounds.filter(function (r) { return !r.claimed; });
     var wei = open.reduce(function (a, r) { return a + BigInt(r.amount); }, 0n);
     var eth = Number(wei) / 1e18;
     el.innerHTML =
-      '<div class="w-stats"><div><b>' + fmt(eth, 8) + "</b><span>claimable ETH</span></div>" +
-      "<div><b>" + open.length + "</b><span>open epochs</span></div>" +
-      "<div><b>" + (c.rounds.length - open.length) + "</b><span>already claimed</span></div></div>" +
+      '<div class="w-stats"><div><b>' + fmt(eth, 8) + "</b><span>ETH claimable</span></div>" +
+      "<div><b>" + open.length + "</b><span>epochs open</span></div>" +
+      "<div><b>" + (c.rounds.length - open.length) + "</b><span>claimed already</span></div></div>" +
       '<div class="wallet-btns"><button class="act act-ice" id="btnClaimReal"' +
       (open.length ? "" : " disabled") + ">claim " + fmt(eth, 6) + " ETH</button></div>" +
-      '<p class="foot">Each epoch\'s payout is fixed on-chain by a Merkle root — ' +
-      "the amount is proven, not trusted.</p>";
+      '<p class="foot">Every epoch\'s payout is pinned on-chain by a Merkle root — ' +
+      "the sum is proven rather than trusted.</p>";
     var b = $("btnClaimReal");
     if (b) b.addEventListener("click", claimReal);
   }
@@ -788,7 +788,7 @@
         r.proof.map(function (p) { return num32(p); }).join("");
       // офсет массива = 3 слова (epoch, amount, offset) → 0x60
     } else {
-      actStatus("", "claiming " + open.length + " epochs, one signature per epoch…");
+      actStatus("", "claiming " + open.length + " epochs — one signature each…");
     }
     if (open.length > 1) {
       // последовательные claim'ы — проще и дешевле в отладке, чем claimMany
@@ -806,7 +806,7 @@
             setTimeout(next, 2500);
           })
           .catch(function (e) {
-            actStatus("err", "claim failed: " + ((e && e.message) || "rejected"));
+            actStatus("err", "claim did not go through: " + ((e && e.message) || "declined"));
           });
       };
       ensureChain().then(next);
