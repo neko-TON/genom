@@ -1,3 +1,5 @@
 genom.json
 __pycache__/
 .DS_Store
+.claude/
+.superpowers/
