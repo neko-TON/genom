@@ -663,7 +663,7 @@
     b.hidden = !noSim;
     b.textContent = W3.account
       ? W3.account.slice(0, 6) + "…" + W3.account.slice(-4)
-      : "CONNECT WALLET";
+      : "LINK WALLET";
     var ac = $("cardActions");
     if (ac) ac.hidden = !(state && state.mode === "live" && W3.account);
   }
