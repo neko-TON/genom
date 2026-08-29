@@ -301,7 +301,6 @@ section[id] { scroll-margin-top: 40px; }
 @keyframes flowmove { from { offset-distance: 0%; } to { offset-distance: 100%; } }
 
 /* ---------- dna limits block ---------- */
-.dna-sec { }
 .dna-wrap { display: flex; gap: 64px; align-items: center; }
 .dna-helix svg { width: 150px; display: block; }
 .dna-strands path { stroke: var(--ice); opacity: .5; stroke-width: 5; fill: none; stroke-linecap: round; }
