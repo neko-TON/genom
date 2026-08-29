@@ -120,16 +120,16 @@ DEFAULT_RPC = "https://rpc.mainnet.chain.robinhood.com"
 PHASE_LIMITS = {0: (3500, 2000), 1: (3500, 2000), 2: (2000, 700), 3: (3500, 2000)}
 
 THESIS_LEADS = [
-    "Momentum in {a} and {b} remains intact; adding on strength.",
-    "Trimming {a} after the run, rotating into {b}.",
-    "Earnings setup favors {a}; keeping {b} at benchmark weight.",
-    "Volatility regime is rising; concentration in {a} comes down.",
-    "Flows into tokenized {a} keep improving; {b} stays a funding source.",
+    "The momentum behind {a} and {b} is still alive; buying into the strength.",
+    "Cutting back {a} after its run and rotating the proceeds into {b}.",
+    "The earnings setup leans toward {a}; {b} stays at its benchmark weight.",
+    "With the volatility regime climbing, concentration in {a} is being reduced.",
+    "Inflows to tokenized {a} continue to build; {b} remains the funding leg.",
 ]
 THESIS_TAILS = [
-    "Cash held at {c}% as dry powder.",
-    "Raising cash to {c}% ahead of the macro print.",
-    "Cash at {c}%; turnover kept well inside the mandate.",
+    "Keeping {c}% in cash as dry powder.",
+    "Lifting cash to {c}% before the macro print.",
+    "Cash sits at {c}%; turnover stays comfortably within the mandate.",
 ]
 
 
@@ -189,7 +189,7 @@ class Sim:
         self.last_rebalance_epoch = 0
         self.hold_mode = False
         self._shadow_positions = None    # dict like self.positions, set at phase 1 entry
-        self.log("node online — passive index, phase 0")
+        self.log("node up — passive index, phase 0")
 
     # ---- helpers ----
     def log(self, msg):
@@ -244,7 +244,7 @@ class Sim:
         sniper = self._holder("sniper")
         sniper["balance"] += 800_000
         self.volume_epoch += 800_000 * TOKEN_PRICE
-        self.log("sniper bot bought 800k $NSTRO 12s before the close")
+        self.log("12s before the close, the sniper bot picked up 800k $NSTRO")
 
     def _holder(self, hid):
         return next(h for h in self.holders if h["id"] == hid)
@@ -263,7 +263,7 @@ class Sim:
             amount = min(amount, you["balance"])
             you["balance"] -= amount
         self.volume_epoch += amount * TOKEN_PRICE
-        self.log("your wallet %s %s $NSTRO" % (
+        self.log("your wallet has %s %s $NSTRO" % (
             "bought" if side == "buy" else "sold", format(int(amount), ",")))
 
     def claim(self):
@@ -276,7 +276,7 @@ class Sim:
         scale = max(0.0, 1.0 - paid / self.nav())
         for a in self.positions:
             self.positions[a] *= scale
-        self.log("you claimed %.2f USDG" % paid)
+        self.log("you collected %.2f USDG" % paid)
         return paid
 
     def _integrate(self, dt):
@@ -315,10 +315,10 @@ class Sim:
         self.epoch_start = self.t     # force_close may fire mid-epoch
         if self.phase < 1 and self.epoch >= 3:
             self.phase = 1
-            self.log("phase 1 — shadow mode: sealed calls, no execution")
+            self.log("phase 1 — shadow mode: calls are sealed, nothing executes")
         if self.phase < 2 and self.epoch >= 9:
             self.phase = 2
-            self.log("phase 2 — execution live at reduced limits")
+            self.log("phase 2 — trading enabled under reduced limits")
 
     def _on_close(self):
         tax = self.volume_epoch * 0.03
@@ -336,7 +336,7 @@ class Sim:
         sniper = self._holder("sniper")
         if sniper["balance"] > 0:
             sniper["balance"] = 0
-            self.log("sniper exited right after the close — share ~0 (balance × time)")
+            self.log("right after the close the sniper left — share ~0 (balance × time)")
         for h in self.holders:
             h["integral"] = 0.0
         self._supply_integral = 0.0
@@ -352,7 +352,7 @@ class Sim:
         was_hold = self.hold_mode
         self.hold_mode = (self.treasury_usdg / self.epoch_cost) < 14.0
         if self.hold_mode and not was_hold:
-            self.log("runway under 14 days — hold mode: one rebalance per 3 epochs")
+            self.log("under 14 days of runway — hold mode: one rebalance every 3 epochs")
         if not self.frozen and len(self.uv) >= 2:
             window = self.uv[max(len(self.uv) - 7, self._uv_guard_start):]
             if window and self.uv[-1] <= 0.75 * max(window):
@@ -361,17 +361,17 @@ class Sim:
                 nav = self.nav()
                 self.positions = {a: 0.0 for a in WHITELIST}
                 self.positions[CASH] = nav
-                self.log("BREAKER: drawdown ≤ −25% over 7 epochs — frozen, "
-                         "basket parked in USDG")
+                self.log("BREAKER: a −25% drawdown inside 7 epochs — agent frozen, "
+                         "basket sitting in USDG")
         for g in [g for g in self.gov_queue if g["eta"] <= self.epoch + 1]:
             self.gov_queue.remove(g)
             if g["action"] == "phase3":
                 self.phase = 3
-                self.log("governance: phase 3 unlocked — full mandate")
+                self.log("governance: full mandate — phase 3 is open")
             elif g["action"] == "unfreeze":
                 self.frozen = False
                 self._uv_guard_start = len(self.uv)
-                self.log("governance: agent unfrozen by holder vote")
+                self.log("governance: holders voted the agent back on")
 
     def _reveal_pending(self):
         if not self._pending_commit or self._pending_commit["epoch"] != self.epoch:
@@ -384,8 +384,8 @@ class Sim:
                                           p["thesis"], p["nonce"]) == rec["hash"]
             rec["thesis"] = p["thesis"]
             rec["revealed_at"] = self.t
-            self.log("epoch %d thesis revealed — keccak %s" %
-                     (p["epoch"], "verified" if rec["verified"] else "MISMATCH"))
+            self.log("epoch %d thesis unsealed — keccak %s" %
+                     (p["epoch"], "confirmed" if rec["verified"] else "MISMATCH"))
         self._pending_commit = None
 
     def _propose_weights(self):
@@ -431,7 +431,7 @@ class Sim:
         stocks = sorted((a for a in WHITELIST if target.get(a)),
                         key=lambda a: -target[a])
         if not stocks:
-            return "Basket parked in USDG; awaiting mandate."
+            return "The basket is parked in USDG while a mandate is awaited."
         a, b = stocks[0], stocks[1 if len(stocks) > 1 else 0]
         lead = self.rng.choice(THESIS_LEADS).format(a=a, b=b)
         tail = self.rng.choice(THESIS_TAILS).format(c=round(target.get(CASH, 0) / 100))
@@ -445,35 +445,35 @@ class Sim:
         checks = []
         bad_assets = [a for a in target if a != CASH and a not in WHITELIST]
         checks.append({"name": "whitelist", "ok": not bad_assets,
-                       "detail": ("%d assets checked" % len(target)) if not bad_assets
-                       else "%s not whitelisted" % bad_assets[0]})
+                       "detail": ("%d assets screened" % len(target)) if not bad_assets
+                       else "%s is off the whitelist" % bad_assets[0]})
         top = max((a for a in target if a != CASH), key=lambda a: target[a])
-        checks.append({"name": "max weight", "ok": target[top] <= max_w,
-                       "detail": "top %s %.1f%% %s %.1f%%" % (
+        checks.append({"name": "weight cap", "ok": target[top] <= max_w,
+                       "detail": "largest %s %.1f%% %s %.1f%%" % (
                            top, target[top] / 100,
                            "≤" if target[top] <= max_w else ">", max_w / 100)})
         small = [a for a in target if a != CASH and 0 < target[a] < 500]
-        checks.append({"name": "min position", "ok": not small,
-                       "detail": "all positions ≥ 5% or zero" if not small
-                       else "%s at %.1f%% < 5%%" % (small[0], target[small[0]] / 100)})
+        checks.append({"name": "position floor", "ok": not small,
+                       "detail": "every position ≥ 5% or exactly zero" if not small
+                       else "%s sits at %.1f%% < 5%%" % (small[0], target[small[0]] / 100)})
         checks.append({"name": "turnover", "ok": turnover <= max_turn,
                        "detail": "%.1f%% %s %.1f%% NAV" % (
                            turnover / 100, "≤" if turnover <= max_turn else ">",
                            max_turn / 100)})
         allowed = (not self.hold_mode) or (self.epoch - self.last_rebalance_epoch >= 3) \
                   or turnover == 0
-        checks.append({"name": "single rebalance", "ok": allowed,
-                       "detail": "1 of 1 this epoch" if not self.hold_mode
-                       else "hold mode: one rebalance per 3 epochs"})
+        checks.append({"name": "one rebalance", "ok": allowed,
+                       "detail": "1 rebalance of 1 this epoch" if not self.hold_mode
+                       else "hold mode: a single rebalance every 3 epochs"})
         cash = target.get(CASH, 0)
-        checks.append({"name": "cash band", "ok": 0 <= cash <= 10000,
-                       "detail": "cash %.1f%% within 0–100%%" % (cash / 100)})
+        checks.append({"name": "cash range", "ok": 0 <= cash <= 10000,
+                       "detail": "cash %.1f%% inside 0–100%%" % (cash / 100)})
         total = sum(target.values())
-        checks.append({"name": "weights sum", "ok": total == 10000,
-                       "detail": "sum %.2f%%" % (total / 100)})
-        checks.append({"name": "agent status", "ok": not self.frozen,
-                       "detail": "agent frozen — breaker active" if self.frozen
-                       else "agent active"})
+        checks.append({"name": "weights total", "ok": total == 10000,
+                       "detail": "total %.2f%%" % (total / 100)})
+        checks.append({"name": "agent state", "ok": not self.frozen,
+                       "detail": "agent on ice — breaker engaged" if self.frozen
+                       else "agent operational"})
         return checks, turnover
 
     def _agent_cycle(self):
@@ -490,14 +490,14 @@ class Sim:
         del self.track[:-40]
         self._pending_commit = {"epoch": next_epoch, "weights_list": weights_list,
                                 "thesis": thesis, "nonce": nonce}
-        self.log("epoch %d decision sealed: %s…" % (next_epoch, h[:18]))
+        self.log("decision for epoch %d sealed: %s…" % (next_epoch, h[:18]))
         checks, turnover = self._guard_checks(target)
         rec["checks"] = checks
         rec["turnover_bps"] = turnover
         failed = next((c for c in checks if not c["ok"]), None)
         if failed:
             rec["cancelled"] = failed["detail"]
-            self.log("epoch %d CANCELLED by MandateGuard: %s" %
+            self.log("MandateGuard voided epoch %d: %s" %
                      (next_epoch, failed["detail"]))
             return
         self._accepted_target = target
@@ -521,7 +521,7 @@ class Sim:
         for a in self.positions:
             tgt_v = nav_after * target.get(a, 0) / 10000.0
             self.positions[a] = tgt_v / self.price_of(a)
-        self.log("batch executed: %d trades, max impact %d bps, cost %.2f USDG"
+        self.log("batch complete: %d trades, %d bps max impact, %.2f USDG in costs"
                  % (len(trades), max_imp, cost))
         return {"trades": trades, "max_impact_bps": max_imp, "cost": cost}
 
@@ -529,14 +529,14 @@ class Sim:
         if any(g["action"] == action for g in self.gov_queue):
             return False
         if action == "phase3" and self.phase == 2:
-            label = "Vote: unlock phase 3 (full mandate 35% / 20%)"
+            label = "Vote — open phase 3 (full mandate 35% / 20%)"
         elif action == "unfreeze" and self.frozen:
-            label = "Vote: unfreeze the agent"
+            label = "Vote — lift the agent freeze"
         else:
             return False
         self.gov_queue.append({"label": label, "action": action,
                                "eta": self.epoch + 3})
-        self.log("governance vote queued: %s — timelock 3 epochs" % action)
+        self.log("vote queued: %s — 3-epoch timelock" % action)
         return True
 
     def _update_shadow(self):
@@ -670,7 +670,7 @@ def build_live(cfg):
         block = int(rpc_call(url, "eth_blockNumber", []), 16)
         code = rpc_call(url, "eth_getCode", [vault, "latest"]) or "0x"
         if code == "0x":
-            return {"ok": False, "error": "no contract code at %s" % vault}
+            return {"ok": False, "error": "no contract bytecode found at %s" % vault}
         live = {"ok": True, "chain_id": chain_id, "block": block,
                 "vault": vault, "code_size": (len(code) - 2) // 2}
         try:

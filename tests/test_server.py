@@ -259,8 +259,8 @@ class TestAgent(unittest.TestCase):
         last = next(e for e in reversed(self.sim.epochs) if e["checks"])
         self.assertEqual(
             [c["name"] for c in last["checks"]],
-            ["whitelist", "max weight", "min position", "turnover",
-             "single rebalance", "cash band", "weights sum", "agent status"])
+            ["whitelist", "weight cap", "position floor", "turnover",
+             "one rebalance", "cash range", "weights total", "agent state"])
 
     def test_bad_vector_cancels_and_freezes_basket(self):
         self.to_epoch(10)                              # phase 2, execution on
@@ -349,7 +349,7 @@ class TestTreasuryGov(unittest.TestCase):
         self.sim.force_close()
         rec = self.sim.epochs[-1]
         self.assertIsNotNone(rec["cancelled"])
-        status = next(c for c in rec["checks"] if c["name"] == "agent status")
+        status = next(c for c in rec["checks"] if c["name"] == "agent state")
         self.assertFalse(status["ok"])
 
 
