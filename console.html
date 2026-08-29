@@ -26,21 +26,21 @@
       <span class="wordmark">NOSTRO<em>CONSOLE</em></span>
     </a>
     <span class="pill mono">$NSTRO</span>
-    <a href="index.html" class="navlink">overview</a>
+    <a href="index.html" class="navlink">front page</a>
   </div>
 
   <div class="top-stats mono" id="topStats"></div>
 
-  <button id="btnWallet" class="ctl ctl-ice mono" hidden>CONNECT WALLET</button>
+  <button id="btnWallet" class="ctl ctl-ice mono" hidden>LINK WALLET</button>
 
   <div class="top-ctl">
-    <button id="btnPause" class="ctl" title="Pause / resume">⏸</button>
-    <select id="selSpeed" class="ctl mono" title="Simulation speed">
+    <button id="btnPause" class="ctl" title="Halt / continue">⏸</button>
+    <select id="selSpeed" class="ctl mono" title="Speed of the simulation">
       <option value="15">epoch = 15s</option>
       <option value="60" selected>epoch = 60s</option>
       <option value="180">epoch = 180s</option>
     </select>
-    <button id="btnAdvance" class="ctl ctl-ice" title="Close the epoch now">next epoch →</button>
+    <button id="btnAdvance" class="ctl ctl-ice" title="Finish the epoch immediately">skip to next epoch →</button>
   </div>
   <div class="epoch-line"><span id="epochProgress"></span></div>
 </header>
@@ -49,91 +49,91 @@
 
 <main class="grid">
   <section class="card col-12" id="cardLive" hidden>
-    <h2><span class="cn mono">on-chain</span> Connected contract <span class="mono lf-status ok" id="cfgStatus"></span></h2>
+    <h2><span class="cn mono">on-chain</span> Contract currently attached <span class="mono lf-status ok" id="cfgStatus"></span></h2>
     <div id="liveInfo"></div>
-    <p class="foot mono">configured from the terminal: ./nstro connect &lt;vault&gt; [rpc] · ./nstro sim</p>
+    <p class="foot mono">set up via the terminal: ./nstro connect &lt;vault&gt; [rpc] · ./nstro sim</p>
   </section>
 
   <section class="card col-12" id="cardOnWallet" hidden>
-    <h2><span class="cn mono">your wallet</span> On-chain balance & claim</h2>
+    <h2><span class="cn mono">your wallet</span> Live balance & claiming</h2>
     <div id="onWallet" class="mono"></div>
   </section>
 
   <section class="card col-12" id="cardActions" hidden>
-    <h2><span class="cn mono">actions</span> Do it on-chain — connected wallet signs</h2>
+    <h2><span class="cn mono">actions</span> Act on-chain — signed by the attached wallet</h2>
     <div class="act-grid">
       <div class="act-box">
-        <p class="act-t mono">TRADE ON THE CURVE</p>
+        <p class="act-t mono">DEAL ON THE CURVE</p>
         <div class="act-row">
-          <input id="buyEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="ETH to spend">
-          <button class="act act-ice" id="btnBuy">buy with ETH</button>
+          <input id="buyEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="amount of ETH to spend">
+          <button class="act act-ice" id="btnBuy">spend ETH to buy</button>
         </div>
         <div class="act-row">
-          <input id="sellTok" class="amt mono" type="number" value="100000" step="10000" min="0" aria-label="tokens to sell">
-          <button class="act" id="btnSell">sell tokens</button>
+          <input id="sellTok" class="amt mono" type="number" value="100000" step="10000" min="0" aria-label="how many tokens to sell">
+          <button class="act" id="btnSell">unload tokens</button>
         </div>
-        <p class="act-hint mono">buy/sell run against the Pons bonding curve · 1% fee</p>
+        <p class="act-hint mono">buys and sells settle against the Pons bonding curve · 1% fee</p>
       </div>
       <div class="act-box">
-        <p class="act-t mono">FEED THE NOSTRO VAULT</p>
+        <p class="act-t mono">TOP UP THE NOSTRO VAULT</p>
         <div class="act-row">
-          <input id="feedEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="ETH to send">
-          <button class="act act-ice" id="btnFeed">send ETH fees</button>
+          <input id="feedEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="amount of ETH to send">
+          <button class="act act-ice" id="btnFeed">push ETH fees in</button>
         </div>
         <div class="act-row">
           <button class="act" id="btnProcessWeth">process WETH → split</button>
-          <button class="act" id="btnBurn">burn stray token</button>
+          <button class="act" id="btnBurn">torch a stray token</button>
         </div>
-        <p class="act-hint mono">ETH/WETH → 80/13/7 split · other tokens → burned to dead</p>
+        <p class="act-hint mono">ETH/WETH are split 80/13/7 · anything else is burned to the dead address</p>
       </div>
     </div>
     <p id="actStatus" class="mono act-status"></p>
   </section>
 
   <section class="card col-7" id="cardBasket">
-    <h2><span class="cn mono">NostroVault</span> Basket</h2>
+    <h2><span class="cn mono">NostroVault</span> The basket</h2>
     <div id="basket"></div>
     <p class="foot mono" id="basketFoot"></p>
   </section>
 
   <section class="card col-5" id="cardChart">
-    <h2><span class="cn mono">NAV</span> Unit value: actual vs shadow</h2>
+    <h2><span class="cn mono">NAV</span> Unit value — realized vs shadow</h2>
     <canvas id="chart" height="220"></canvas>
     <div class="legend mono">
-      <span><i class="sw sw-fact"></i>actual (executed)</span>
-      <span><i class="sw sw-shadow"></i>agent shadow (no execution)</span>
+      <span><i class="sw sw-fact"></i>realized (executed)</span>
+      <span><i class="sw sw-shadow"></i>the agent's shadow (never executed)</span>
     </div>
   </section>
 
   <section class="card col-7" id="cardTrack">
-    <h2><span class="cn mono">CommitStore</span> Track record · hash lands before the swap · click an epoch for details</h2>
+    <h2><span class="cn mono">CommitStore</span> Track record · the hash arrives ahead of the swap · open any epoch for detail</h2>
     <div id="track"></div>
   </section>
 
   <section class="card col-5" id="cardWallet">
-    <h2><span class="cn mono">your wallet</span> Balance & claim</h2>
+    <h2><span class="cn mono">your wallet</span> Holdings & claiming</h2>
     <div id="wallet"></div>
     <div class="wallet-btns">
-      <input id="tradeAmt" class="amt mono" type="number" value="100000" min="0" step="10000" aria-label="Trade amount, $NSTRO">
+      <input id="tradeAmt" class="amt mono" type="number" value="100000" min="0" step="10000" aria-label="$NSTRO amount to trade">
       <button class="act" data-trade="buy">buy</button>
       <button class="act" data-trade="sell">sell</button>
       <button class="act act-ice" id="btnClaim">claim</button>
     </div>
-    <p class="foot">No claim schedule: whatever has accrued can be taken at any moment.</p>
+    <p class="foot">There is no claiming timetable — anything accrued is yours to take at any time.</p>
   </section>
 
   <section class="card col-7" id="cardHolders">
-    <h2><span class="cn mono">weight × time</span> Holders</h2>
+    <h2><span class="cn mono">weight × time</span> The holders</h2>
     <div id="holders"></div>
   </section>
 
   <section class="card col-5" id="cardGuard">
-    <h2><span class="cn mono">MandateGuard</span> Latest vector check</h2>
+    <h2><span class="cn mono">MandateGuard</span> Most recent vector check</h2>
     <div id="guard"></div>
   </section>
 
   <section class="card col-4" id="cardTreasury">
-    <h2><span class="cn mono">AgentTreasury</span> Operations</h2>
+    <h2><span class="cn mono">AgentTreasury</span> Operating budget</h2>
     <div id="treasury"></div>
   </section>
 
@@ -143,14 +143,14 @@
   </section>
 
   <section class="card col-4" id="cardLog">
-    <h2><span class="cn mono">events</span> Node log</h2>
+    <h2><span class="cn mono">activity</span> Node journal</h2>
     <div id="log" class="mono"></div>
   </section>
 </main>
 
 <footer class="bottom mono">
-  Nostro Agent · local full-cycle simulation of concept v0.1 · genuine keccak256 + abi.encode ·
-  Robinhood Chain / Pons V2 / Uniswap V4 are emulated by this node
+  Nostro Agent · a full-cycle local simulation of concept v0.1 · real keccak256 + abi.encode ·
+  this node emulates Robinhood Chain / Pons V2 / Uniswap V4
 </footer>
 
 <script src="app.js"></script>
