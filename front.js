@@ -235,13 +235,13 @@
     $("cEpoch").textContent = rec.epoch;
     var st = $("cStatus");
     if (!rec.revealed) {
-      st.innerHTML = 'thesis sealed until the epoch closes<span class="cursor">▌</span>';
+      st.innerHTML = 'the thesis stays sealed until the epoch ends<span class="cursor">▌</span>';
       st.className = "dim";
     } else if (rec.verified) {
-      st.textContent = "revealed / keccak256 verified / on the public record";
+      st.textContent = "opened / keccak256 checked out / part of the public record";
       st.className = "term-ok";
     } else {
-      st.textContent = "revealed / hash mismatch / epoch marked failed";
+      st.textContent = "opened / hashes disagree / epoch stamped failed";
       st.className = "term-bad";
     }
     if (rec.epoch !== lastHashEpoch) {
@@ -267,18 +267,18 @@
     if (!el) return;
     if (!ok) {
       el.className = "strip-state err";
-      el.textContent = "NODE OFFLINE — RUN: python3 server.py";
+      el.textContent = "NODE DOWN — START IT: python3 server.py";
       return;
     }
     if (s && s.mode === "live") {
       el.className = "strip-state";
-      el.textContent = "LIVE ON-CHAIN";
+      el.textContent = "ON-CHAIN · LIVE";
     } else if (s && s.public) {
       el.className = "strip-state sim";
-      el.textContent = "STANDBY / LAUNCHING ON PONS V2";
+      el.textContent = "ON STANDBY / GOING LIVE ON PONS V2";
     } else {
       el.className = "strip-state sim";
-      el.textContent = "SIM DATA / LOCAL NODE / CONCEPT V0.1";
+      el.textContent = "SIMULATED DATA / LOCAL NODE / CONCEPT V0.1";
     }
   }
 
@@ -294,7 +294,7 @@
     if (!lv) return;
     lv.hidden = !noSim;
     if (!live && s.public) {
-      lv.textContent = "THE TOKEN ADDRESS IS NOT CONNECTED YET";
+      lv.textContent = "NO TOKEN ADDRESS HAS BEEN ATTACHED YET";
       return;
     }
     if (live && s.live && s.live.ok) {
@@ -314,7 +314,7 @@
         (L.symbol || "?") + " SUPPLY <b>" + (L.total_supply != null ? fmt(L.total_supply) : "—") +
         "</b> · " + tail;
     } else if (live) {
-      lv.textContent = "reading the chain…";
+      lv.textContent = "pulling chain state…";
     }
   }
 
@@ -335,7 +335,7 @@
         var st = $("cStatus");
         if (st) {
           st.className = "dim";
-          st.innerHTML = 'commits go on the public record once the vault is live<span class="cursor">▌</span>';
+          st.innerHTML = 'once the vault is live, commits land on the public record<span class="cursor">▌</span>';
         }
       }
       renderPhases(s);
