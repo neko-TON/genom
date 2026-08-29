@@ -201,7 +201,7 @@
     if (!tape) return;
     var items = Object.keys(s.prices).map(function (a) {
       var w = s.weights[a];
-      return '<span class="tape-item">' + a + " <b>" + fmt(s.prices[a], 2) + "</b>" +
+      return '<span class="tape-item">' + tkrIcon(a) + a + " <b>" + fmt(s.prices[a], 2) + "</b>" +
         (w ? ' <span class="w">' + (w / 100).toFixed(1) + "%</span>" : "") +
         "</span>";
     }).join("");
@@ -219,7 +219,7 @@
     }).slice(0, 5);
     var maxW = Math.max.apply(null, entries.map(function (e) { return e[1]; }).concat([1]));
     el.innerHTML = entries.map(function (e) {
-      return '<div class="mb-row"><span class="mb-t">' + e[0] + "</span>" +
+      return '<div class="mb-row"><span class="mb-t">' + tkrIcon(e[0]) + e[0] + "</span>" +
         '<div class="mb-bar"><div class="mb-fill' + (e[0] === "USDG" ? " cash" : "") +
         '" style="width:' + (e[1] / maxW * 100).toFixed(1) + '%"></div></div>' +
         '<span class="mb-w">' + (e[1] / 100).toFixed(1) + "%</span></div>";

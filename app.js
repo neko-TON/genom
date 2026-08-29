@@ -100,7 +100,7 @@
     $("basket").innerHTML = rows.sort(function (a, b) { return b.value - a.value; })
       .map(function (r) {
         var pct = nav > 0 ? (r.value / nav * 100) : 0;
-        return '<div class="b-row"><span class="b-tkr">' + esc(r.sym) + "</span>" +
+        return '<div class="b-row"><span class="b-tkr">' + tkrIcon(r.sym) + esc(r.sym) + "</span>" +
           '<div class="b-bar"><div class="b-fill' + (r.sym === "USDG" ? " cash" : "") +
           '" style="width:' + (r.value / maxV * 100).toFixed(1) + '%"></div></div>' +
           '<span class="b-w">' + (r.value > 0 ? pct.toFixed(1) + "% · " : "") +
@@ -349,7 +349,7 @@
     $("basket").innerHTML = entries.map(function (e) {
       var a = e[0], w = e[1];
       var val = s.nav * w / 10000;
-      return '<div class="b-row"><span class="b-tkr">' + a + "</span>" +
+      return '<div class="b-row"><span class="b-tkr">' + tkrIcon(a) + a + "</span>" +
         '<div class="b-bar"><div class="b-fill' + (a === "USDG" ? " cash" : "") +
         '" style="width:' + (w / maxW * 100).toFixed(1) + '%"></div></div>' +
         '<span class="b-w">' + (w / 100).toFixed(1) + "% · " + fmt(val) + "</span>" +

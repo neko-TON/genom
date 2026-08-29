@@ -131,6 +131,7 @@ select.ctl option { background: #0a2013; color: var(--ink); }
 .b-fill.cash { background: var(--good); }
 .b-w { font-family: var(--fm); font-size: 11.5px; color: var(--ink); text-align: right; }
 .b-p { font-family: var(--fm); font-size: 10.5px; color: var(--mute); text-align: right; }
+.tkr-ico { width: 13px; height: 13px; vertical-align: -2px; margin-right: 7px; opacity: .85; }
 
 /* ---------- chart ---------- */
 #chart { width: 100%; }

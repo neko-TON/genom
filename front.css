@@ -212,6 +212,7 @@ section[id] { scroll-margin-top: 40px; }
 .mb-fill { height: 100%; background: var(--ice); transition: width .8s cubic-bezier(.22,.61,.36,1); }
 .mb-fill.cash { background: var(--good); }
 .mb-w { font-size: 11px; color: var(--mute); text-align: right; }
+.tkr-ico { width: 12px; height: 12px; vertical-align: -2px; margin-right: 5px; opacity: .8; }
 
 /* worst */
 .worst { display: grid; grid-template-columns: repeat(3, 1fr); gap: 44px; }
