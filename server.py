@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nostro node — backend for the nostro.capital frontend.
+"""Genom node — backend for the site frontend.
 
 Serves the static site + JSON API, runs the full economic simulation,
 and (in live mode) reads Robinhood Chain over JSON-RPC.
@@ -110,7 +110,7 @@ def make_nonce(rng=None):
 WHITELIST = ["AAPL", "TSLA", "NVDA", "MSFT", "AMZN", "GOOGL", "META", "HOOD", "COIN", "PLTR"]
 CASH = "USDG"
 EPOCH_SIM = 86400.0
-TOKEN_PRICE = 0.001            # USDG per $NSTRO, for volume accounting
+TOKEN_PRICE = 0.001            # USDG per $GENOM, for volume accounting
 START_PRICES = {"AAPL": 235.0, "TSLA": 340.0, "NVDA": 185.0, "MSFT": 520.0,
                 "AMZN": 230.0, "GOOGL": 200.0, "META": 780.0, "HOOD": 95.0,
                 "COIN": 310.0, "PLTR": 155.0}
@@ -244,7 +244,7 @@ class Sim:
         sniper = self._holder("sniper")
         sniper["balance"] += 800_000
         self.volume_epoch += 800_000 * TOKEN_PRICE
-        self.log("12s before the close, the sniper bot picked up 800k $NSTRO")
+        self.log("12s before the close, the sniper bot picked up 800k $GENOM")
 
     def _holder(self, hid):
         return next(h for h in self.holders if h["id"] == hid)
@@ -263,7 +263,7 @@ class Sim:
             amount = min(amount, you["balance"])
             you["balance"] -= amount
         self.volume_epoch += amount * TOKEN_PRICE
-        self.log("your wallet has %s %s $NSTRO" % (
+        self.log("your wallet has %s %s $GENOM" % (
             "bought" if side == "buy" else "sold", format(int(amount), ",")))
 
     def claim(self):
@@ -593,7 +593,7 @@ class Sim:
 
 # ==== live chain ================================================
 
-CONFIG_PATH = Path(os.environ.get("NSTRO_CONFIG") or (ROOT / "nstro.json"))
+CONFIG_PATH = Path(os.environ.get("GENOM_CONFIG") or (ROOT / "genom.json"))
 FEE_VAULT_ADDR = "0xB2FC6481A65BACc91277a3488dcc7f6b1C210813"
 SEL_NAME, SEL_SYMBOL = "0x06fdde03", "0x95d89b41"
 SEL_DECIMALS, SEL_TOTAL = "0x313ce567", "0x18160ddd"
@@ -635,7 +635,7 @@ def rpc_call(url, method, params, timeout=4):
                           "method": method, "params": params}).encode()
     req = urllib.request.Request(url, data=payload,
                                  headers={"Content-Type": "application/json",
-                                         "User-Agent": "nstro-node/0.1"})
+                                         "User-Agent": "genom-node/0.1"})
     try:
         with urllib.request.urlopen(req, timeout=timeout, context=_SSL_CTX) as r:
             out = json.loads(r.read())
@@ -728,7 +728,7 @@ CONTENT_TYPES = {".html": "text/html; charset=utf-8", ".css": "text/css",
 
 
 class NodeHandler(BaseHTTPRequestHandler):
-    server_version = "NostroNode/0.1"
+    server_version = "GenomNode/0.1"
 
     def log_message(self, fmt, *args):
         pass                                          # keep the console quiet
@@ -827,7 +827,7 @@ class NodeHandler(BaseHTTPRequestHandler):
 
 
 def make_node(port, seed=None, public=False, config=None):
-    # config override keeps tests hermetic: a developer's real nstro.json
+    # config override keeps tests hermetic: a developer's real genom.json
     # (gitignored, possibly in live mode) must never leak into the suite
     srv = ThreadingHTTPServer(("127.0.0.1", port), NodeHandler)
     srv.sim = Sim(seed=seed)
@@ -857,7 +857,7 @@ def start_ticker(srv):
 
 def main(argv=None):
     import argparse
-    ap = argparse.ArgumentParser(description="Nostro node")
+    ap = argparse.ArgumentParser(description="Genom node")
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--public", action="store_true")
@@ -869,7 +869,7 @@ def main(argv=None):
         return 1
     start_ticker(srv)
     start_live_poller(srv)
-    print("nostro node: http://localhost:%d  (Ctrl+C to stop)" % args.port)
+    print("genom node: http://localhost:%d  (Ctrl+C to stop)" % args.port)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

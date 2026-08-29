@@ -388,7 +388,7 @@ class TestHttp(unittest.TestCase):
     def test_static_pages(self):
         status, body, headers = self.get("/")
         self.assertEqual(status, 200)
-        self.assertIn(b"NOSTRO", body)
+        self.assertIn(b"GENOM", body)
         self.assertIn("text/html", headers["Content-Type"])
         self.assertEqual(self.get("/console.html")[0], 200)
         self.assertEqual(self.get("/front.js")[0], 200)
@@ -538,24 +538,24 @@ class TestLive(unittest.TestCase):
         self.assertEqual(server.decode_abi_string(bytes.fromhex(_abi_str("hey"))), "hey")
 
     def test_cli_connect_and_sim(self):
-        cli = str(Path(server.__file__).parent / "nstro")
+        cli = str(Path(server.__file__).parent / "genom")
         addr = "0x" + "ab" * 20
-        env = dict(os.environ, NSTRO_CONFIG=str(
-            Path(tempfile.mkdtemp()) / "nstro.json"))
+        env = dict(os.environ, GENOM_CONFIG=str(
+            Path(tempfile.mkdtemp()) / "genom.json"))
         r = subprocess.run([sys.executable, cli, "connect", addr, self.rpc_url],
                            capture_output=True, text=True, env=env)
         self.assertEqual(r.returncode, 0, r.stderr)
-        cfg = _json.loads(Path(env["NSTRO_CONFIG"]).read_text())
+        cfg = _json.loads(Path(env["GENOM_CONFIG"]).read_text())
         self.assertEqual(cfg["mode"], "live")
         self.assertEqual(cfg["vault"], addr)
         r = subprocess.run([sys.executable, cli, "sim"],
                            capture_output=True, text=True, env=env)
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertEqual(_json.loads(
-            Path(env["NSTRO_CONFIG"]).read_text())["mode"], "sim")
+            Path(env["GENOM_CONFIG"]).read_text())["mode"], "sim")
 
     def test_cli_rejects_bad_address(self):
-        cli = str(Path(server.__file__).parent / "nstro")
+        cli = str(Path(server.__file__).parent / "genom")
         r = subprocess.run([sys.executable, cli, "connect", "nonsense"],
                            capture_output=True, text=True)
         self.assertNotEqual(r.returncode, 0)

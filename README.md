@@ -1,6 +1,6 @@
-# nostro.capital — локальный узел
+# Genom — локальный узел
 
-Сайт Nostro Agent ($NSTRO): лендинг + консоль с полной симуляцией
+Сайт Genom Agent ($GENOM): лендинг + консоль с полной симуляцией
 экономики (эпохи, корзина, keccak-коммиты агента, MandateGuard, брейкер,
 голосования) и live-режимом чтения Robinhood Chain.
 
@@ -22,12 +22,12 @@ Governance.
 
 ## Live-режим
 
-    ./nstro connect 0x<адрес-токена> [rpc-url]   # подключить контракт
-    ./nstro sim                                  # вернуть симуляцию
-    ./nstro status [порт]                        # что происходит
+    ./genom connect 0x<адрес-токена> [rpc-url]   # подключить контракт
+    ./genom sim                                  # вернуть симуляцию
+    ./genom status [порт]                        # что происходит
 
 RPC по умолчанию: https://rpc.mainnet.chain.robinhood.com (chain id 4663).
-Узел подхватывает nstro.json на лету, рестарт не нужен.
+Узел подхватывает genom.json на лету, рестарт не нужен.
 
 ## Тесты
 
