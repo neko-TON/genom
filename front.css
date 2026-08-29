@@ -370,3 +370,4 @@ section[id] { scroll-margin-top: 40px; }
   .sec-head h2.t-on .tch { opacity: 0; animation: tch-in .01s steps(1) forwards; }
 }
 @keyframes tch-in { to { opacity: 1; } }
+.sec-head h2.t-done .tch { animation: none; opacity: 1; }

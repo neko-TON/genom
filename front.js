@@ -204,6 +204,7 @@
         h2.replaceChild(frag, node);
       });
       h2.classList.add("t-on");
+      setTimeout(function () { h2.classList.add("t-done"); }, Math.round(idx * step) + 600);
     }
 
     var io = new IntersectionObserver(function (entries) {
