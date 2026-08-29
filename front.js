@@ -181,7 +181,11 @@
     if (!heads.length) return;
 
     function wrap(h2) {
-      h2.setAttribute("aria-label", h2.textContent);
+      var label = "";
+      Array.prototype.forEach.call(h2.childNodes, function (n) {
+        label += n.nodeType === 3 ? n.textContent : " ";
+      });
+      h2.setAttribute("aria-label", label.replace(/\s+/g, " ").trim());
       var total = h2.textContent.length || 1;
       var step = Math.min(40, 700 / total);
       var idx = 0;
