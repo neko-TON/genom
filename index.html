@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nostro Agent — $NSTRO</title>
-<meta name="description" content="An index token. A 3% trading tax buys tokenized stocks into a shared basket. An autonomous agent sets the weights; a contract enforces the mandate; every decision is hash-committed before execution.">
+<meta name="description" content="An index token where a 3% tax on trades keeps purchasing tokenized stocks for a common basket. Weights are chosen by an autonomous agent, the mandate is policed by a contract, and each decision is committed as a hash before it runs.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,11 +32,11 @@
     <span class="mono">NOSTRO&nbsp;AGENT</span>
   </a>
   <nav class="hd-nav mono">
-    <a href="index.html#how">MECHANICS</a>
-    <a href="index.html#proof">PROOF</a>
-    <a href="index.html#rollout">ROLLOUT</a>
+    <a href="index.html#how">THE MACHINERY</a>
+    <a href="index.html#proof">EVIDENCE</a>
+    <a href="index.html#rollout">LAUNCH PATH</a>
   </nav>
-  <a class="hd-console mono" href="console.html">OPEN CONSOLE ↗</a>
+  <a class="hd-console mono" href="console.html">LAUNCH CONSOLE ↗</a>
 </header>
 
 <main>
@@ -54,23 +54,21 @@
 
   <div class="hero-in">
     <p class="mono hero-kicker rv">
-      <span class="kick-badge">LAUNCHING ON PONS V2</span>
-      $NSTRO — AN INDEX TOKEN THAT RUNS ITSELF, INSIDE HARD LIMITS
+      <span class="kick-badge">GOING LIVE ON PONS V2</span>
+      $NSTRO — A SELF-DRIVING INDEX TOKEN, BOXED IN BY HARD LIMITS
     </p>
     <h1 class="rv d1">
-      <span>YOUR CAPITAL.</span>
-      <span>THE AGENT'S DECISIONS.</span>
-      <span class="hl">THE CONTRACT'S LIMITS.</span>
+      <span>THE MONEY IS YOURS.</span>
+      <span>THE CALLS ARE THE AGENT'S.</span>
+      <span class="hl">THE LIMITS ARE THE CONTRACT'S.</span>
     </h1>
     <div class="hero-foot rv d2">
       <p class="hero-sub">
-        A 3% tax on every trade keeps buying tokenized stocks into a shared basket.
-        An autonomous agent sets the weights. MandateGuard rejects anything outside
-        the mandate. The agent's key can propose — it can never withdraw.
+        Every trade pays a 3% tax that continuously purchases tokenized stocks for a common basket. The weights are chosen by an autonomous agent. Anything that steps outside the mandate is thrown out by MandateGuard. The agent's key may only propose — withdrawing is beyond its power.
       </p>
       <div class="hero-act">
-        <a class="btn mono" href="console.html">OPEN THE LIVE CONSOLE&nbsp;→</a>
-        <a class="lnk mono" href="index.html#how">how it works ↓</a>
+        <a class="btn mono" href="console.html">GO TO THE LIVE CONSOLE&nbsp;→</a>
+        <a class="lnk mono" href="index.html#how">see how it runs ↓</a>
       </div>
     </div>
   </div>
@@ -92,51 +90,49 @@
   <div class="wrap">
     <div class="sec-head rv">
       <span class="mono sec-idx">01</span>
-      <h2>WHAT HAPPENS<br>EVERY 24 HOURS</h2>
+      <h2>THE ROUTINE THAT RUNS<br>EVERY 24 HOURS</h2>
     </div>
     <ol class="ledger">
       <li class="rv">
         <span class="mono no">00</span>
-        <div><h3>Launched on Pons V2, Robinhood Chain</h3>
-          <p>$NSTRO starts on the Pons bonding curve and graduates into a Uniswap v4 pool
-            with permanently locked liquidity. Trading fees are charged by the launchpad
-            in ETH and routed straight into the contracts below — nothing is manual.</p></div>
+        <div><h3>Born on Pons V2, on Robinhood Chain</h3>
+          <p>$NSTRO begins life on the Pons bonding curve, then graduates to a Uniswap v4 pool whose liquidity is locked forever. The launchpad collects trading fees in ETH and pipes them directly into the contracts described below — no step is manual.</p></div>
         <span class="mono kpi">pons v2</span>
       </li>
       <li class="rv">
         <span class="mono no">01</span>
-        <div><h3>Every trade pays 3%</h3>
-          <p>80% buys the holders' basket, 13% funds the agent's operations, 7% goes to the protocol. Creator fees add 1% in USDG. Nobody has to do anything — the flow never stops.</p></div>
+        <div><h3>A 3% charge on every trade</h3>
+          <p>80% purchases the holders' basket, 13% pays for the agent's operations, and 7% is the protocol's share. On top, creator fees contribute 1% in USDG. No one needs to lift a finger — the stream never pauses.</p></div>
         <span class="mono kpi">80 / 13 / 7</span>
       </li>
       <li class="rv">
         <span class="mono no">02</span>
-        <div><h3>Shares accrue by balance × time</h3>
-          <p>Not by snapshot. A bot entering one block before the close earns nothing. Claim whenever you want — there is no distribution schedule to snipe.</p></div>
+        <div><h3>Your share builds up as balance × time</h3>
+          <p>There are no snapshots. A bot that shows up one block before the close walks away with nothing. Collect whenever it suits you — no payout calendar exists for anyone to snipe.</p></div>
         <span class="mono kpi">bal × t</span>
       </li>
       <li class="rv">
         <span class="mono no">03</span>
-        <div><h3>The decision is sealed before the trade</h3>
-          <p>The agent publishes keccak256(epoch, weights, thesis, nonce) before anything moves. Reasoning goes on record first, outcome comes second — never the other way around.</p></div>
+        <div><h3>Decisions are locked in before any trade</h3>
+          <p>Before a single asset moves, the agent publishes keccak256(epoch, weights, thesis, nonce). The reasoning is recorded first and the result arrives after — the order is never reversed.</p></div>
         <span class="mono kpi">keccak256</span>
       </li>
       <li class="rv">
         <span class="mono no">04</span>
-        <div><h3>The contract checks the vector</h3>
-          <p>Whitelist only. Weight ≤ 35%. Position ≥ 5%. Turnover ≤ 20% NAV. One rebalance per epoch. Cash 0–100%. Any failure cancels the epoch and the basket stays put.</p></div>
+        <div><h3>The vector is vetted by the contract</h3>
+          <p>Whitelisted assets only. Weight ≤ 35%. Position ≥ 5%. Turnover ≤ 20% NAV. A single rebalance per epoch. Cash 0–100%. If any check fails, the epoch is voided and the basket does not move.</p></div>
         <span class="mono kpi">8 checks</span>
       </li>
       <li class="rv">
         <span class="mono no">05</span>
-        <div><h3>Execution is one batch</h3>
-          <p>Swaps go through Uniswap V4 pools together. Slippage over the limit reverts everything — no partial fills, no surprises.</p></div>
+        <div><h3>All execution happens in one batch</h3>
+          <p>The swaps travel through Uniswap V4 pools as a group. If slippage breaches the limit, the whole batch reverts — no partial fills and no surprises.</p></div>
         <span class="mono kpi">1 batch</span>
       </li>
       <li class="rv">
         <span class="mono no">06</span>
-        <div><h3>The thesis is revealed and re-hashed</h3>
-          <p>Next epoch, the text is opened and verified against the sealed hash. A mismatch marks the epoch failed — publicly, forever. The track record cannot be rewritten.</p></div>
+        <div><h3>The thesis is opened and hashed again</h3>
+          <p>In the following epoch the text is unsealed and checked against the committed hash. If they disagree, the epoch is branded failed — in public, permanently. Rewriting the track record is impossible.</p></div>
         <span class="mono kpi">N + 1</span>
       </li>
     </ol>
@@ -148,24 +144,22 @@
   <div class="wrap">
     <div class="sec-head rv">
       <span class="mono sec-idx">02</span>
-      <h2>THIS NODE IS RUNNING<br>THE WHOLE THING NOW</h2>
+      <h2>EVERYTHING HERE IS ALREADY<br>RUNNING ON THIS NODE</h2>
     </div>
     <div class="proof rv d1">
       <div class="term mono">
-        <div class="term-hd"><span>COMMITSTORE</span><span>LATEST SEALED DECISION</span></div>
+        <div class="term-hd"><span>COMMITSTORE</span><span>MOST RECENT SEALED DECISION</span></div>
         <div class="term-bd">
           <p class="dim">commit = keccak256(abi.encode(epoch, weights, thesisText, nonce))</p>
-          <p>epoch <span class="ice" id="cEpoch">—</span> <span class="dim">/ submitted before execution</span></p>
+          <p>epoch <span class="ice" id="cEpoch">—</span> <span class="dim">/ filed ahead of execution</span></p>
           <p class="hashline" id="cHash">0x————————————————————————————————————————————————————————————————</p>
-          <p class="dim" id="cStatus">connecting to node<span class="cursor">▌</span></p>
+          <p class="dim" id="cStatus">linking to the node<span class="cursor">▌</span></p>
         </div>
       </div>
       <div class="proof-side">
-        <p>The console shows the basket rebalancing, the guard rejecting bad vectors,
-          the sniper bot earning nothing, the breaker, the votes — and your own wallet
-          trading and claiming against it.</p>
+        <p>In the console you can watch the basket rebalance, the guard throw out bad vectors, the sniper bot come away empty, the breaker, the votes — and trade and claim against it with a wallet of your own.</p>
         <div class="mini mono" id="miniBasket"></div>
-        <a class="btn mono" href="console.html">OPEN THE CONSOLE&nbsp;→</a>
+        <a class="btn mono" href="console.html">STEP INTO THE CONSOLE&nbsp;→</a>
       </div>
     </div>
   </div>
@@ -176,23 +170,23 @@
   <div class="wrap">
     <div class="sec-head rv">
       <span class="mono sec-idx">03</span>
-      <h2>THE DOWNSIDE IS ENGINEERED,<br>NOT PROMISED</h2>
+      <h2>THE WORST CASE IS DESIGNED IN,<br>NOT TAKEN ON FAITH</h2>
     </div>
     <div class="worst">
       <div class="w-col rv">
         <span class="mono no">A</span>
-        <h3>The agent breaks</h3>
-        <p>Worst case: whitelisted stocks in bad proportions, at most a fifth of NAV turned over per day. Withdrawing assets is not a function its key has.</p>
+        <h3>The agent malfunctions</h3>
+        <p>At worst you hold whitelisted stocks in poor proportions, with no more than a fifth of NAV churned per day. Its key simply has no function for withdrawing assets.</p>
       </div>
       <div class="w-col rv">
         <span class="mono no">B</span>
-        <h3>Drawdown hits −25% in 7 epochs</h3>
-        <p>The breaker freezes the agent and parks the basket in USDG. Only a holder vote with a 3-day timelock switches it back on.</p>
+        <h3>A −25% drawdown lands within 7 epochs</h3>
+        <p>The breaker halts the agent and moves the basket into USDG to wait. Turning it back on takes a holder vote plus a 3-day timelock — nothing else.</p>
       </div>
       <div class="w-col rv">
         <span class="mono no">C</span>
-        <h3>Holders stop trusting it</h3>
-        <p>Limits, whitelist, the agent itself — all replaceable by vote. Three days of timelock give dissenters time to exit first.</p>
+        <h3>Holders lose faith in it</h3>
+        <p>The limits, the whitelist, even the agent — a vote can swap out any of them. A 3-day timelock leaves those who disagree room to leave first.</p>
       </div>
     </div>
   </div>
@@ -203,13 +197,13 @@
   <div class="wrap">
     <div class="sec-head rv">
       <span class="mono sec-idx">04</span>
-      <h2>TRUST IS EARNED<br>IN PUBLIC</h2>
+      <h2>CONFIDENCE IS BUILT<br>OUT IN THE OPEN</h2>
     </div>
     <ol class="ph rv d1">
-      <li data-ph="0"><span class="mono no">P0</span><div><h3>Passive index</h3><p>Static weights. Accrual and claims running, agent off.</p></div><span class="mono cur">● CURRENT</span></li>
-      <li data-ph="1"><span class="mono no">P1</span><div><h3>Shadow mode</h3><p>30 epochs of sealed public calls, zero execution. Hypothetical charted next to real.</p></div><span class="mono cur">● CURRENT</span></li>
-      <li data-ph="2"><span class="mono no">P2</span><div><h3>Reduced limits</h3><p>Execution live at 7% NAV turnover, 20% weight cap.</p></div><span class="mono cur">● CURRENT</span></li>
-      <li data-ph="3"><span class="mono no">P3</span><div><h3>Full mandate</h3><p>A holder vote unlocks 35% weights, 20% NAV turnover, new whitelist entries.</p></div><span class="mono cur">● CURRENT</span></li>
+      <li data-ph="0"><span class="mono no">P0</span><div><h3>Passive index</h3><p>Weights fixed in place. Accrual and claiming live; the agent stays off.</p></div><span class="mono cur">● CURRENT</span></li>
+      <li data-ph="1"><span class="mono no">P1</span><div><h3>Shadow mode</h3><p>30 epochs of calls sealed in public with zero execution. The hypothetical curve is plotted beside the real one.</p></div><span class="mono cur">● CURRENT</span></li>
+      <li data-ph="2"><span class="mono no">P2</span><div><h3>Reduced limits</h3><p>Trading switched on with turnover held to 7% NAV and weights capped at 20%.</p></div><span class="mono cur">● CURRENT</span></li>
+      <li data-ph="3"><span class="mono no">P3</span><div><h3>Full mandate</h3><p>By holder vote: weights up to 35%, NAV turnover up to 20%, and fresh whitelist entries.</p></div><span class="mono cur">● CURRENT</span></li>
     </ol>
   </div>
 </section>
@@ -217,16 +211,16 @@
 <!-- ================= END ================= -->
 <section class="fin rv">
   <div class="wrap">
-    <h2>YOUR CAPITAL. THE AGENT'S DECISIONS.<br><span class="hl">THE CONTRACT'S LIMITS.</span></h2>
-    <a class="btn mono" href="console.html">OPEN THE LIVE CONSOLE&nbsp;→</a>
+    <h2>THE MONEY IS YOURS. THE CALLS ARE THE AGENT'S.<br><span class="hl">THE LIMITS ARE THE CONTRACT'S.</span></h2>
+    <a class="btn mono" href="console.html">GO TO THE LIVE CONSOLE&nbsp;→</a>
   </div>
 </section>
 
 </main>
 
 <footer class="ft mono">
-  NOSTRO AGENT — LAUNCHING ON PONS V2 · ROBINHOOD CHAIN (4663) · UNISWAP V4.
-  NOT AN OFFER. AGENT DECISIONS ARE HASH-COMMITTED ON-CHAIN BEFORE EXECUTION.
+  NOSTRO AGENT — GOING LIVE ON PONS V2 · ROBINHOOD CHAIN (4663) · UNISWAP V4.
+  THIS IS NOT AN OFFER. EVERY AGENT DECISION IS COMMITTED ON-CHAIN AS A HASH BEFORE IT EXECUTES.
 </footer>
 
 <script src="front.js"></script>
