@@ -385,7 +385,7 @@
     var x = function (i, len) { return 6 + (W - 12) * i / (len - 1); };
     var y = function (v) { return H - 8 - (H - 16) * (v - lo) / (hi - lo); };
 
-    ctx.strokeStyle = "rgba(171,224,255,.08)";
+    ctx.strokeStyle = "rgba(99,245,166,.08)";
     ctx.lineWidth = 1;
     for (var gy = 0; gy <= 4; gy++) {
       ctx.beginPath();
@@ -395,7 +395,7 @@
     }
     // базовая линия 1.0
     if (lo < 1 && 1 < hi) {
-      ctx.strokeStyle = "rgba(171,224,255,.2)";
+      ctx.strokeStyle = "rgba(99,245,166,.2)";
       ctx.setLineDash([4, 5]);
       ctx.beginPath(); ctx.moveTo(0, y(1)); ctx.lineTo(W, y(1)); ctx.stroke();
       ctx.setLineDash([]);
@@ -411,8 +411,8 @@
       }
       ctx.stroke(); ctx.setLineDash([]);
     }
-    line(b, "rgba(77,163,255,.55)", 1.6, [5, 4]);
-    line(a, "#abe0ff", 2.2);
+    line(b, "rgba(157,123,255,.55)", 1.6, [5, 4]);
+    line(a, "#63f5a6", 2.2);
   }
 
   var openEpochs = {};

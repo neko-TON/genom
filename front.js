@@ -19,7 +19,7 @@
       disperseStrength: 1,
       idleDim: 0.65,
       snakeAmplitude: 0.5,
-      color: [171, 224, 255],
+      color: [125, 245, 170],
       colorfulSparks: true,
     };
     var WAVES = 2.4, WAVES2 = 5.5, PHASE = -0.35, PHASE2 = 0.2, WAVESY = 3, AMPY = 0.02;
@@ -53,7 +53,7 @@
         off: wide ? rand(-0.16, 0.16) : rand(-0.03, 0.03),
         speed: rand(0.0001, 0.0004),
         size: Math.round(rand(7, 13)),
-        hue: rand(190, 320),
+        hue: rand(100, 290),
         colorful: Math.random() < 0.3 && t < 0.55,
         life: rand(0.5, 1),
         wAmp: rand(0.02, 0.1),
