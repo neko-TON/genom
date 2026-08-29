@@ -4,7 +4,7 @@
   --bg: #020804;
   --ink: #eafcef;
   --dim: #93b8a3;
-  --mute: #5c7568;
+  --mute: #637e6f;
   --ice: #63f5a6;
   --ice-b: #c9ffdf;
   --blue: #9d7bff;
@@ -31,7 +31,7 @@ img, svg, canvas { display: block; }
 .mono { font-family: var(--fm); }
 ::selection { background: rgba(99, 245, 166, .3); }
 ::-webkit-scrollbar { width: 9px; }
-::-webkit-scrollbar-thumb { background: #142234; }
+::-webkit-scrollbar-thumb { background: #12241a; }
 :focus-visible { outline: 1px solid var(--ice); outline-offset: 3px; }
 
 .wrap { max-width: 1220px; margin: 0 auto; padding: 0 28px; }

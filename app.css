@@ -6,7 +6,7 @@
   --line-2: rgba(99, 245, 166, .26);
   --ink: #eafcef;
   --dim: #93b8a3;
-  --mute: #5c7568;
+  --mute: #637e6f;
   --ice: #63f5a6;
   --ice-b: #c9ffdf;
   --blue: #9d7bff;
@@ -34,7 +34,7 @@ button, select { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 ::selection { background: rgba(99, 245, 166, .3); }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-thumb { background: #142234; }
+::-webkit-scrollbar-thumb { background: #12241a; }
 :focus-visible { outline: 1px solid var(--ice); outline-offset: 2px; }
 
 /* ---------- topbar ---------- */
@@ -68,7 +68,7 @@ a { color: inherit; text-decoration: none; }
 .ctl:hover { background: rgba(99, 245, 166, .12); }
 .ctl-ice { background: var(--ice); color: #04140b; font-weight: 700; border-color: var(--ice); }
 .ctl-ice:hover { background: var(--ice-b); }
-select.ctl option { background: #0a1220; color: var(--ink); }
+select.ctl option { background: #0a2013; color: var(--ink); }
 
 .epoch-line { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
 .epoch-line span {
