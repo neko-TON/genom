@@ -202,6 +202,6 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 - [ ] Ask the user for the explicit "да" to publish this build to production (spec gate). Do not deploy without it.
 - [ ] `npx vercel link --yes --project genom` then `npx vercel --prod --yes` from the repo root (CLI already authenticated by the user).
-- [ ] Production checks: `GET <prod>/api/state` twice ≥65s apart → `epoch` advanced by ≥1 and `public` is true; `GET <prod>/api/claims` → `{"distributor": null, "rounds": []}`.
+- [ ] Production checks: `GET <prod>/api/state` twice ≥10 minutes apart (public epoch = 10 min) → `epoch` advanced by ≥1 and `public` is true; `GET <prod>/api/claims` → `{"distributor": null, "rounds": []}`.
 - [ ] Browser pass on the prod URL: landing shows live strip values (no eternal LINKING UP); console renders the basket as an observer (no pause/skip/trade controls — public mode); mobile width OK; zero console errors.
 - [ ] Report the production URL to the user; then finishing-a-development-branch.
