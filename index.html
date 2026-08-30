@@ -214,33 +214,41 @@
 
 <!-- ================= DNA LIMITS ================= -->
 <section class="sec dna-sec">
-  <div class="wrap dna-wrap rv">
-    <div class="dna-helix" aria-hidden="true">
-      <svg viewBox="0 0 150 350">
-        <g class="dna-strands">
-          <path d="M100 8 C48 46 48 82 100 120 C152 158 152 194 100 232 C48 270 48 306 100 344"/>
-          <path d="M50 8 C102 46 102 82 50 120 C-2 158 -2 194 50 232 C102 270 102 306 50 344"/>
-        </g>
-        <g class="dna-rungs">
-          <path class="r1" d="M56 40 L94 40"/>
-          <path class="r2" d="M50 96 L100 96"/>
-          <path class="r3" d="M56 152 L94 152"/>
-          <path class="r4" d="M50 208 L100 208"/>
-          <path class="r5" d="M56 264 L94 264"/>
-        </g>
-      </svg>
+  <div class="wrap">
+    <p class="mono flow-title rv">LIMITS IN THE DNA</p>
+    <div class="gene-grid">
+      <div class="gene rv mono">
+        <span class="gene-code">LIM-01</span>
+        <span class="gene-val">≤35%</span>
+        <div class="gene-track"><i class="gt-fill" style="width:35%"></i><i class="gt-cap" style="left:35%"></i></div>
+        <span class="gene-lbl">WEIGHT ≤ 35%</span>
+      </div>
+      <div class="gene rv mono">
+        <span class="gene-code">LIM-02</span>
+        <span class="gene-val">≥5%</span>
+        <div class="gene-track"><i class="gt-zone" style="left:5%;right:0"></i><i class="gt-cap" style="left:5%"></i><i class="gt-dot" style="left:-2px"></i></div>
+        <span class="gene-lbl">POSITION ≥ 5% OR ZERO</span>
+      </div>
+      <div class="gene rv mono">
+        <span class="gene-code">LIM-03</span>
+        <span class="gene-val">≤20%</span>
+        <div class="gene-track"><i class="gt-fill" style="width:20%"></i><i class="gt-cap" style="left:20%"></i></div>
+        <span class="gene-lbl">TURNOVER ≤ 20% NAV</span>
+      </div>
+      <div class="gene rv mono">
+        <span class="gene-code">LIM-04</span>
+        <span class="gene-val">1×</span>
+        <div class="gene-track"><i class="gt-dot" style="left:calc(50% - 4px)"></i></div>
+        <span class="gene-lbl">ONE REBALANCE PER EPOCH</span>
+      </div>
+      <div class="gene rv mono">
+        <span class="gene-code">LIM-05</span>
+        <span class="gene-val">0–100%</span>
+        <div class="gene-track"><i class="gt-fill gt-open" style="width:100%"></i></div>
+        <span class="gene-lbl">CASH 0–100%</span>
+      </div>
     </div>
-    <div class="dna-list mono">
-      <p class="flow-title">LIMITS IN THE DNA</p>
-      <ul>
-        <li>WEIGHT ≤ 35%</li>
-        <li>POSITION ≥ 5% OR ZERO</li>
-        <li>TURNOVER ≤ 20% NAV</li>
-        <li>ONE REBALANCE PER EPOCH</li>
-        <li>CASH 0–100%</li>
-      </ul>
-      <p class="dna-foot">Any failing vector: the epoch is voided and the basket does not move.</p>
-    </div>
+    <p class="dna-foot mono rv d2">Any failing vector: the epoch is voided and the basket does not move.</p>
   </div>
 </section>
 

@@ -273,7 +273,6 @@
     for (var i = 0; i < idx.length; i++) add(idx[i], -0.05, 18, 2);
     add(document.querySelector(".flow-svg"), 0.04, 14, 0);
     add(document.querySelector(".flow-svg-m"), 0.04, 14, 0);
-    add(document.querySelector(".dna-helix svg"), 0.04, 14, 0);
 
     var ticking = false;
     function frame() {

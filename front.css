@@ -306,25 +306,6 @@ section[id] { scroll-margin-top: 40px; }
 @media (prefers-reduced-motion: reduce) { .flow-dots { display: none; } }
 @keyframes flowmove { from { offset-distance: 0%; } to { offset-distance: 100%; } }
 
-/* ---------- dna limits block ---------- */
-.dna-wrap { display: flex; gap: 64px; align-items: center; }
-.dna-helix svg { width: 150px; display: block; }
-.dna-strands path { stroke: var(--ice); opacity: .5; stroke-width: 5; fill: none; stroke-linecap: round; }
-.dna-rungs path { stroke: var(--ice); stroke-width: 4; stroke-linecap: round; opacity: .35; }
-@media (prefers-reduced-motion: no-preference) {
-  .dna-rungs path { animation: rungpulse 3.2s ease-in-out infinite; }
-  .dna-rungs .r2 { animation-delay: .64s; }
-  .dna-rungs .r3 { animation-delay: 1.28s; }
-  .dna-rungs .r4 { animation-delay: 1.92s; }
-  .dna-rungs .r5 { animation-delay: 2.56s; }
-}
-@keyframes rungpulse { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
-.dna-list ul { list-style: none; padding: 0; margin: 20px 0; display: grid; gap: 14px; }
-.dna-list li { color: var(--ink); font-size: 14px; letter-spacing: .08em; }
-.dna-list li::before { content: "— "; color: var(--ice); }
-.dna-foot { color: var(--mute); font-size: 12px; letter-spacing: .06em; }
-@media (max-width: 760px) { .dna-wrap { flex-direction: column; align-items: flex-start; gap: 30px; } }
-
 /* ---------- micro-motion & air ---------- */
 .ledger li, .w-col { transition: transform .3s ease; }
 .ledger li .no, .w-col .no { transition: color .3s ease; }
@@ -452,12 +433,6 @@ section[id] { scroll-margin-top: 40px; }
   .ph.rv.in li:nth-child(2) { animation-delay: .09s; }
   .ph.rv.in li:nth-child(3) { animation-delay: .18s; }
   .ph.rv.in li:nth-child(4) { animation-delay: .27s; }
-  /* каскад лимитов ДНК от появления родителя */
-  .dna-wrap.rv.in .dna-list li { animation: rv .5s cubic-bezier(.22, .61, .36, 1) both; }
-  .dna-wrap.rv.in .dna-list li:nth-child(2) { animation-delay: .08s; }
-  .dna-wrap.rv.in .dna-list li:nth-child(3) { animation-delay: .16s; }
-  .dna-wrap.rv.in .dna-list li:nth-child(4) { animation-delay: .24s; }
-  .dna-wrap.rv.in .dna-list li:nth-child(5) { animation-delay: .32s; }
   /* прорисовка штрих-кода слева направо */
   .sec-head.rv.in .seq-rule i { animation: tickin .25s both; }
   .sec-head.rv.in .seq-rule i:nth-child(2)  { animation-delay: .025s; }
@@ -477,3 +452,31 @@ section[id] { scroll-margin-top: 40px; }
   .sec-head.rv.in .seq-rule i:nth-child(16) { animation-delay: .375s; }
 }
 @keyframes tickin { from { opacity: 0; } }
+
+.dna-foot { color: var(--mute); font-size: 12px; letter-spacing: .06em; }
+
+/* ---------- gene cards (limits) ---------- */
+.gene-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 30px; }
+.gene {
+  border: 1px solid var(--line-2); background: rgba(99, 245, 166, .03);
+  padding: 16px 14px 18px; display: flex; flex-direction: column; gap: 12px;
+}
+.gene-code { font-size: 9px; letter-spacing: .3em; color: var(--blue); text-shadow: var(--glow-uv); }
+.gene-val { font-family: var(--fd); font-weight: 600; font-size: 22px; color: var(--ink); text-shadow: var(--glow-g); }
+.gene-lbl { font-size: 10px; letter-spacing: .12em; color: var(--dim); line-height: 1.55; }
+.gene-track { position: relative; height: 5px; background: rgba(99, 245, 166, .1); }
+.gene-track i { position: absolute; display: block; }
+.gt-fill { top: 0; bottom: 0; left: 0; background: linear-gradient(90deg, rgba(99, 245, 166, .85), rgba(99, 245, 166, .5)); box-shadow: 0 0 10px rgba(99, 245, 166, .5); }
+.gt-open { opacity: .55; }
+.gt-zone { top: 0; bottom: 0; background: rgba(99, 245, 166, .35); }
+.gt-cap { top: -3px; bottom: -3px; width: 2px; background: var(--blue); box-shadow: 0 0 8px rgba(157, 123, 255, .8); }
+.gt-dot { top: -2px; width: 9px; height: 9px; border-radius: 50%; background: var(--ice); box-shadow: 0 0 8px rgba(99, 245, 166, .8); }
+@media (max-width: 1060px) { .gene-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px) { .gene-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .gene-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: no-preference) {
+  .gene-grid .gene.rv:nth-child(2) { --d: .08s; }
+  .gene-grid .gene.rv:nth-child(3) { --d: .16s; }
+  .gene-grid .gene.rv:nth-child(4) { --d: .24s; }
+  .gene-grid .gene.rv:nth-child(5) { --d: .32s; }
+}
