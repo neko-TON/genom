@@ -91,8 +91,9 @@ section[id] { scroll-margin-top: 40px; }
 /* ---------- hero ---------- */
 .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; }
 .hero-ghost {
-  position: absolute; top: 12%; right: -7%; width: min(46vw, 620px);
+  position: absolute; top: 2%; right: -2%; width: min(32vw, 400px);
   color: var(--ice); opacity: .09; pointer-events: none;
+  transform: rotate(-28deg);
 }
 
 .hero-in {
