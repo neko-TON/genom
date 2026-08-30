@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Genom — admin</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #020804; color: #eafcef; font: 13px/1.6 "JetBrains Mono", monospace;
+         display: flex; min-height: 100vh; align-items: center; justify-content: center; }
+  .box { width: min(520px, 92vw); border: 1px solid rgba(99, 245, 166, .26); padding: 30px; }
+  h1 { font-size: 13px; letter-spacing: .3em; color: #63f5a6; margin-bottom: 22px; }
+  label { display: block; font-size: 10px; letter-spacing: .2em; color: #637e6f; margin: 16px 0 6px; }
+  input { width: 100%; background: rgba(99, 245, 166, .05); border: 1px solid rgba(99, 245, 166, .26);
+          color: #eafcef; font: inherit; padding: 10px 12px; }
+  input:focus { outline: 1px solid #63f5a6; }
+  button { margin-top: 20px; width: 100%; background: #63f5a6; color: #04140b; border: 0;
+           font: inherit; font-weight: 700; letter-spacing: .14em; padding: 12px; cursor: pointer; }
+  .row { margin-top: 18px; font-size: 11px; color: #637e6f; word-break: break-all; }
+  .row b { color: #c9ffdf; font-weight: 500; }
+  #status.ok { color: #35e66b; }
+  #status.err { color: #ff5a3c; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>GENOM ADMIN</h1>
+  <label for="secret">ADMIN SECRET</label>
+  <input id="secret" type="password" autocomplete="off">
+  <label for="ca">CONTRACT ADDRESS (CA)</label>
+  <input id="ca" type="text" autocomplete="off" spellcheck="false" maxlength="80">
+  <button id="apply" type="button">APPLY</button>
+  <p class="row">current: <b id="current">—</b></p>
+  <p class="row" id="status"></p>
+</div>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  try { $("secret").value = localStorage.getItem("genomAdminSecret") || ""; } catch (e) {}
+  function refresh() {
+    fetch("/api/ca").then(function (r) { return r.json(); })
+      .then(function (d) { $("current").textContent = (d && d.ca) || "—"; })
+      .catch(function () { $("current").textContent = "—"; });
+  }
+  $("apply").addEventListener("click", function () {
+    var secret = $("secret").value, ca = $("ca").value;
+    try { localStorage.setItem("genomAdminSecret", secret); } catch (e) {}
+    var st = $("status");
+    st.className = "";
+    st.textContent = "applying…";
+    fetch("/api/admin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ secret: secret, ca: ca })
+    }).then(function (r) {
+      return r.json().then(function (d) { return { s: r.status, d: d }; });
+    }).then(function (x) {
+      if (x.d && x.d.ok) { st.className = "ok"; st.textContent = "applied: " + (x.d.ca || "(cleared)"); }
+      else { st.className = "err"; st.textContent = "error " + x.s + ": " + ((x.d && x.d.error) || ""); }
+      refresh();
+    }).catch(function () { st.className = "err"; st.textContent = "network error"; });
+  });
+  refresh();
+})();
+</script>
+</body>
+</html>

@@ -217,6 +217,49 @@
     Array.prototype.forEach.call(heads, function (h) { io.observe(h); });
   })();
 
+  /* ============ contract address line ============ */
+  (function caLine() {
+    var line = $("caLine"), val = $("caVal"), btn = $("caCopy");
+    if (!line || !val || !btn) return;
+    var full = "";
+    function render(v) {
+      full = typeof v === "string" ? v : "";
+      if (!full) { line.hidden = true; return; }
+      val.textContent = full.length > 30
+        ? full.slice(0, 12) + "…" + full.slice(-8) : full;
+      line.hidden = false;
+    }
+    function poll() {
+      fetch("/api/ca").then(function (r) { return r.json(); })
+        .then(function (d) { render(d && d.ca); })
+        .catch(function () { line.hidden = true; });
+    }
+    function fallbackCopy(text) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    btn.addEventListener("click", function () {
+      if (!full) return;
+      var done = function () {
+        btn.textContent = "COPIED";
+        setTimeout(function () { btn.textContent = "COPY"; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(full).then(done, function () {
+          fallbackCopy(full); done();
+        });
+      } else { fallbackCopy(full); done(); }
+    });
+    poll();
+    setInterval(poll, 5000);
+  })();
+
   /* ============ reveal ============ */
   var rvEls = document.querySelectorAll(".rv");
   if ("IntersectionObserver" in window && !REDUCED) {
