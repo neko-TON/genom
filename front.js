@@ -261,6 +261,50 @@
     setInterval(poll, 5000);
   })();
 
+  /* ============ scroll depth layers & progress ============ */
+  (function depth() {
+    var bar = document.querySelector(".scroll-progress");
+    var se = document.scrollingElement || document.documentElement;
+    var layers = [];
+    function add(el, factor, cap, base) {
+      if (el) layers.push({ el: el, f: factor, cap: cap, base: base });
+    }
+    var idx = document.querySelectorAll(".sec-idx");
+    for (var i = 0; i < idx.length; i++) add(idx[i], -0.05, 18, 2);
+    add(document.querySelector(".flow-svg"), 0.04, 14, 0);
+    add(document.querySelector(".flow-svg-m"), 0.04, 14, 0);
+    add(document.querySelector(".dna-helix svg"), 0.04, 14, 0);
+
+    var ticking = false;
+    function frame() {
+      ticking = false;
+      if (bar) {
+        var max = se.scrollHeight - window.innerHeight;
+        var p = max > 0 ? Math.min(1, Math.max(0, se.scrollTop / max)) : 0;
+        bar.style.transform = "scaleX(" + p + ")";
+      }
+      if (REDUCED) return;
+      var mid = window.innerHeight / 2;
+      for (var j = 0; j < layers.length; j++) {
+        var L = layers[j];
+        var r = L.el.getBoundingClientRect();
+        if (r.bottom < -window.innerHeight || r.top > window.innerHeight * 2) continue;
+        var d = (r.top + r.height / 2 - mid) * L.f;
+        if (d > L.cap) d = L.cap;
+        if (d < -L.cap) d = -L.cap;
+        L.el.style.transform = "translateY(" + (L.base + d) + "px)";
+      }
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(frame);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    onScroll();
+  })();
+
   /* ============ reveal ============ */
   var rvEls = document.querySelectorAll(".rv");
   if ("IntersectionObserver" in window && !REDUCED) {
