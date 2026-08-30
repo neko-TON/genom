@@ -396,3 +396,9 @@ section[id] { scroll-margin-top: 40px; }
   .flow-svg { display: none; }
   .flow-svg-m { display: block; }
 }
+
+/* ---------- mobile tap targets ---------- */
+@media (max-width: 760px) {
+  .lnk, .hd-console { position: relative; }
+  .lnk::after, .hd-console::after { content: ""; position: absolute; left: -6px; right: -6px; top: -10px; bottom: -10px; }
+}

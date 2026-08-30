@@ -260,6 +260,10 @@ a.act { text-decoration: none; display: inline-block; }
   .top-stats { order: 3; width: 100%; margin-left: 0; }
   .b-row { grid-template-columns: 74px 1fr 80px; }
   .b-p { display: none; }
+  .top { gap: 10px 14px; padding: 9px 14px 11px; }
+  .top-ctl { gap: 6px; }
+  .ctl { padding: 5px 9px; font-size: 10.5px; }
+  .top-stats { gap: 6px 14px; font-size: 11px; }
 }
 
 /* ---------- sequencer glow (console) ---------- */
@@ -269,3 +273,9 @@ a.act { text-decoration: none; display: inline-block; }
 .cn::before { content: "\25B8  "; color: rgba(157, 123, 255, .95); text-shadow: var(--glow-uv); }
 .top-stats b { text-shadow: var(--glow-gs); }
 .pill { text-shadow: var(--glow-gs); }
+
+/* ---------- mobile tap targets ---------- */
+@media (max-width: 760px) {
+  .navlink { position: relative; }
+  .navlink::after { content: ""; position: absolute; left: -6px; right: -6px; top: -11px; bottom: -11px; }
+}
