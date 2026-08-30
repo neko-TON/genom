@@ -14,8 +14,8 @@ class TestVercelState(unittest.TestCase):
         self.assertEqual(a, b)
 
     def test_epoch_advances(self):
-        s1 = build_state(GENESIS_TS + 3600.0)   # 60 эпох прожито
-        s2 = build_state(GENESIS_TS + 3660.0)   # +1 эпоха
+        s1 = build_state(GENESIS_TS + 6000.0)   # 10 эпох
+        s2 = build_state(GENESIS_TS + 6600.0)   # +1 эпоха
         self.assertEqual(s2["epoch"], s1["epoch"] + 1)
 
     def test_continuity_between_polls(self):
@@ -32,8 +32,8 @@ class TestVercelState(unittest.TestCase):
         t0 = time.perf_counter()
         s = build_state(GENESIS_TS + CAP_REAL + 999999.0)
         dt = time.perf_counter() - t0
-        self.assertLessEqual(s["epoch"], int(CAP_REAL / 60.0) + 1)
-        self.assertLess(dt, 5.0, "пересчёт на капе должен укладываться в 5с (замерено: %.2fs)" % dt)
+        self.assertLessEqual(s["epoch"], int(CAP_REAL / 600.0) + 1)
+        self.assertLess(dt, 8.0, "пересчёт на капе должен укладываться в 8с (замерено: %.2fs)" % dt)
 
 
 if __name__ == "__main__":

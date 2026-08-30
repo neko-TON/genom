@@ -16,8 +16,8 @@ from server import EPOCH_SIM, Sim  # noqa: E402
 
 GENOM_SEED = 4663                  # chain id Robinhood Chain — фиксированный мир
 GENESIS_TS = 1788048000.0          # 2026-08-30 00:00:00 UTC
-SPEED = 1440.0                     # sim-сек за реальную сек (эпоха = 60с)
-CAP_REAL = 20160 * 60.0            # ~2 недели жизни; дальше мир замирает
+SPEED = 144.0                      # sim-сек за реальную сек (эпоха = 10 минут)
+CAP_REAL = 2016 * 600.0            # ~2 недели жизни (2016 эпох); дальше мир замирает
 
 
 def build_state(now=None):
