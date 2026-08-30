@@ -373,3 +373,26 @@ section[id] { scroll-margin-top: 40px; }
 }
 @keyframes tch-in { to { opacity: 1; } }
 .sec-head h2.t-done .tch { animation: none; opacity: 1; }
+
+/* ---------- mobile flow diagram ---------- */
+.flow-svg-m { display: none; width: 100%; max-width: 360px; margin: 26px auto 8px; }
+.flow-top text { text-anchor: middle; }
+.fdm { fill: var(--ice); }
+.fdm80 { offset-path: path("M165 66 C165 105 30 105 30 146"); }
+.fdm13 { offset-path: path("M165 66 C165 165 30 185 30 266"); }
+.fdm7  { offset-path: path("M165 66 C165 225 30 265 30 386"); }
+@media (prefers-reduced-motion: no-preference) {
+  .fdm { animation: flowmove linear infinite; }
+  .fdm80.fma { animation-duration: 2.4s; }
+  .fdm80.fmb { animation-duration: 2.4s; animation-delay: .6s; }
+  .fdm80.fmc { animation-duration: 2.8s; animation-delay: 1.2s; }
+  .fdm80.fmd { animation-duration: 2.8s; animation-delay: 1.8s; }
+  .fdm13.fma { animation-duration: 3s; }
+  .fdm13.fmb { animation-duration: 3s; animation-delay: 1.5s; }
+  .fdm7.fma  { animation-duration: 3.6s; }
+}
+@media (prefers-reduced-motion: reduce) { .flow-dots-m { display: none; } }
+@media (max-width: 760px) {
+  .flow-svg { display: none; }
+  .flow-svg-m { display: block; }
+}
