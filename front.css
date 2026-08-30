@@ -477,3 +477,9 @@ section[id] { scroll-margin-top: 40px; }
   .sec-head.rv.in .seq-rule i:nth-child(16) { animation-delay: .375s; }
 }
 @keyframes tickin { from { opacity: 0; } }
+
+/* ---------- hero helix flow ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-ghost .dna-flow { animation: helixflow 24s linear infinite; }
+}
+@keyframes helixflow { to { transform: translateY(-210px); } }
