@@ -24,10 +24,7 @@
 body {
   font: 14.5px/1.55 var(--ft); color: var(--ink); background: var(--bg);
   background-image:
-    radial-gradient(ellipse 70% 42% at 50% -8%, rgba(157, 123, 255, .16), transparent 70%),
-    linear-gradient(rgba(99,245,166,.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99,245,166,.03) 1px, transparent 1px);
-  background-size: auto, 56px 56px, 56px 56px;
+    radial-gradient(ellipse 70% 42% at 50% -8%, rgba(157, 123, 255, .16), transparent 70%);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
