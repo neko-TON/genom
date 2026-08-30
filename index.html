@@ -165,50 +165,50 @@
         <span>SEQ 01</span>
       </div>
     </div>
-    <ol class="ledger">
-      <li class="rv">
-        <span class="mono no">00</span>
-        <div><h3>Born on Pons V2, on Robinhood Chain</h3>
-          <p>$GENOM begins life on the Pons bonding curve, then graduates to a Uniswap v4 pool whose liquidity is locked forever. The launchpad collects trading fees in ETH and pipes them directly into the contracts described below — no step is manual.</p></div>
-        <span class="mono kpi">pons v2</span>
-      </li>
-      <li class="rv">
-        <span class="mono no">01</span>
-        <div><h3>A 3% charge on every trade</h3>
-          <p><em class="seq-hl">80%</em> purchases the holders' basket, <em class="seq-hl">13%</em> pays for the agent's operations, and <em class="seq-hl">7%</em> is the protocol's share. On top, creator fees contribute 1% in USDG. No one needs to lift a finger — the stream never pauses.</p></div>
-        <span class="mono kpi">80 / 13 / 7</span>
-      </li>
-      <li class="rv">
-        <span class="mono no">02</span>
-        <div><h3>Your share builds up as balance × time</h3>
-          <p>There are no snapshots. A bot that shows up one block before the close walks away with nothing. Collect whenever it suits you — no payout calendar exists for anyone to snipe.</p></div>
-        <span class="mono kpi">bal × t</span>
-      </li>
-      <li class="rv">
-        <span class="mono no">03</span>
-        <div><h3>Decisions are locked in before any trade</h3>
-          <p>Before a single asset moves, the agent publishes keccak256(epoch, weights, thesis, nonce) — the decision's full genetic sequence. The reasoning is recorded first and the result arrives after — the order is never reversed.</p></div>
-        <span class="mono kpi">keccak256</span>
-      </li>
-      <li class="rv">
-        <span class="mono no">04</span>
-        <div><h3>The vector is vetted by the contract</h3>
-          <p>Whitelisted assets only. Weight ≤ 35%. Position ≥ 5%. Turnover ≤ 20% NAV. A single rebalance per epoch. Cash 0–100%. A vector that fails any check is a mutation that never replicates: <em class="seq-hl">the epoch is voided</em> and the basket does not move.</p></div>
-        <span class="mono kpi">8 checks</span>
-      </li>
-      <li class="rv">
-        <span class="mono no">05</span>
-        <div><h3>All execution happens in one batch</h3>
-          <p>The swaps travel through Uniswap V4 pools as a group. If slippage breaches the limit, the whole batch reverts — no partial fills and no surprises.</p></div>
-        <span class="mono kpi">1 batch</span>
-      </li>
-      <li class="rv">
-        <span class="mono no">06</span>
-        <div><h3>The thesis is opened and hashed again</h3>
-          <p>In the following epoch the text is unsealed and checked against the committed hash. If they disagree, the epoch is branded failed — in public, permanently. Rewriting the track record is impossible.</p></div>
-        <span class="mono kpi">N + 1</span>
-      </li>
-    </ol>
+    <div class="mech-grid">
+      <div class="mcard rv">
+        <span class="mono mc-no">00</span>
+        <span class="mono mc-tag">pons v2</span>
+        <b>Born on Pons V2</b>
+        <span class="mc-txt">Bonding curve → Uniswap v4. Liquidity locked forever.</span>
+      </div>
+      <div class="mcard rv">
+        <span class="mono mc-no">01</span>
+        <span class="mono mc-tag">80 / 13 / 7</span>
+        <b>3% on every trade</b>
+        <span class="mc-txt">80% basket · 13% agent · 7% protocol.</span>
+      </div>
+      <div class="mcard rv">
+        <span class="mono mc-no">02</span>
+        <span class="mono mc-tag">bal × t</span>
+        <b>Share = balance × time</b>
+        <span class="mc-txt">No snapshots. Claim anytime.</span>
+      </div>
+      <div class="mcard rv">
+        <span class="mono mc-no">03</span>
+        <span class="mono mc-tag">keccak256</span>
+        <b>Decisions locked first</b>
+        <span class="mc-txt">Sealed as a hash before anything moves.</span>
+      </div>
+      <div class="mcard rv">
+        <span class="mono mc-no">04</span>
+        <span class="mono mc-tag">8 checks</span>
+        <b>The vector is vetted</b>
+        <span class="mc-txt">Fail one → epoch voided.</span>
+      </div>
+      <div class="mcard rv">
+        <span class="mono mc-no">05</span>
+        <span class="mono mc-tag">1 batch</span>
+        <b>One atomic batch</b>
+        <span class="mc-txt">Bad slippage reverts all.</span>
+      </div>
+      <div class="mcard rv">
+        <span class="mono mc-no">06</span>
+        <span class="mono mc-tag">N + 1</span>
+        <b>Thesis re-hashed</b>
+        <span class="mc-txt">Failures are public, forever.</span>
+      </div>
+    </div>
   </div>
 </section>
 

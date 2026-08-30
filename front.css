@@ -170,21 +170,7 @@ section[id] { scroll-margin-top: 40px; }
   line-height: 1.22; letter-spacing: .01em; color: var(--ice-b);
 }
 
-/* ledger */
-.ledger { border-bottom: 1px solid var(--line); }
-.ledger li {
-  display: grid; grid-template-columns: 72px minmax(0, 1fr) 170px;
-  gap: 24px; padding: 30px 12px; margin: 0 -12px;
-  border-top: 1px solid var(--line); align-items: start;
-  transition: background .25s;
-}
-.ledger li:hover { background: linear-gradient(90deg, rgba(99,245,166,.055), transparent 65%); }
-.ledger li:hover .no, .ledger li:hover .kpi { color: var(--ice-b); }
-.ledger .no, .ledger .kpi { transition: color .25s; }
 .no { font-size: 13px; color: var(--mute); letter-spacing: .1em; padding-top: 4px; }
-.ledger h3 { font-size: 18px; font-weight: 600; color: var(--ice-b); margin-bottom: 8px; }
-.ledger p { color: var(--dim); font-size: 14.5px; max-width: 640px; line-height: 1.7; }
-.kpi { font-size: 13px; color: var(--ice); text-align: right; letter-spacing: .06em; padding-top: 6px; }
 
 /* proof */
 .proof { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 44px; align-items: start; }
@@ -271,8 +257,6 @@ section[id] { scroll-margin-top: 40px; }
 @media (max-width: 640px) {
   .sec { padding: 84px 0 20px; }
   .sec-head { flex-direction: column; gap: 10px; margin-bottom: 36px; }
-  .ledger li { grid-template-columns: 44px 1fr; }
-  .ledger .kpi { grid-column: 2; text-align: left; padding-top: 2px; }
   .ph li { grid-template-columns: 44px 1fr; }
   .ph .cur { grid-column: 2; }
   .strip { gap: 6px 22px; }
@@ -307,13 +291,12 @@ section[id] { scroll-margin-top: 40px; }
 @keyframes flowmove { from { offset-distance: 0%; } to { offset-distance: 100%; } }
 
 /* ---------- micro-motion & air ---------- */
-.ledger li, .w-col { transition: transform .3s ease; }
-.ledger li .no, .w-col .no { transition: color .3s ease; }
+.w-col { transition: transform .3s ease; }
+.w-col .no { transition: color .3s ease; }
 @media (prefers-reduced-motion: no-preference) {
-  .ledger li:hover, .w-col:hover { transform: translateY(-3px); }
+  .w-col:hover { transform: translateY(-3px); }
 }
-.ledger li:hover .no, .w-col:hover .no { color: var(--ice); }
-@media (max-width: 760px) { .ledger .kpi { display: none; } }
+.w-col:hover .no { color: var(--ice); }
 
 /* ---------- sequencer typography & glow ---------- */
 .hero-in h1 { text-shadow: var(--glow-g); }
@@ -418,13 +401,6 @@ section[id] { scroll-margin-top: 40px; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* лесенка шагов механики */
-  .ledger li.rv:nth-child(2) { --d: .07s; }
-  .ledger li.rv:nth-child(3) { --d: .14s; }
-  .ledger li.rv:nth-child(4) { --d: .21s; }
-  .ledger li.rv:nth-child(5) { --d: .28s; }
-  .ledger li.rv:nth-child(6) { --d: .35s; }
-  .ledger li.rv:nth-child(7) { --d: .42s; }
   /* лесенка worst-колонок */
   .worst .w-col.rv:nth-child(2) { --d: .11s; }
   .worst .w-col.rv:nth-child(3) { --d: .22s; }
@@ -479,4 +455,26 @@ section[id] { scroll-margin-top: 40px; }
   .gene-grid .gene.rv:nth-child(3) { --d: .16s; }
   .gene-grid .gene.rv:nth-child(4) { --d: .24s; }
   .gene-grid .gene.rv:nth-child(5) { --d: .32s; }
+}
+
+/* ---------- mechanics cards ---------- */
+.mech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.mcard {
+  border: 1px solid var(--line-2); background: rgba(99, 245, 166, .03);
+  padding: 16px 14px 18px; display: flex; flex-direction: column; gap: 8px;
+}
+.mc-no { font-size: 9px; letter-spacing: .3em; color: var(--blue); text-shadow: var(--glow-uv); }
+.mc-tag { font-weight: 700; font-size: 14px; letter-spacing: .08em; color: var(--ice); text-shadow: var(--glow-gs); }
+.mcard b { font-weight: 600; font-size: 12.5px; color: var(--ink); line-height: 1.35; }
+.mc-txt { font-size: 11px; color: var(--dim); line-height: 1.55; }
+@media (max-width: 1060px) { .mech-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px) { .mech-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .mech-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: no-preference) {
+  .mech-grid .mcard.rv:nth-child(2) { --d: .07s; }
+  .mech-grid .mcard.rv:nth-child(3) { --d: .14s; }
+  .mech-grid .mcard.rv:nth-child(4) { --d: .21s; }
+  .mech-grid .mcard.rv:nth-child(5) { --d: .28s; }
+  .mech-grid .mcard.rv:nth-child(6) { --d: .35s; }
+  .mech-grid .mcard.rv:nth-child(7) { --d: .42s; }
 }
