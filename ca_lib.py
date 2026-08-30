@@ -15,7 +15,11 @@ _PRINTABLE = re.compile(r"^[\x20-\x7e]*$")
 
 
 def parse_edge_config(url):
-    """'https://edge-config.vercel.com/<id>?token=<t>' -> (id, token) | None."""
+    """'https://<host>/<id>?token=<t>' -> (id, token, base_url) | None.
+
+    Хост не фиксируем: Vercel переименовал Edge Config в Global Config и
+    выдаёт connection string с global-config.vercel.com (id остался ecfg_*).
+    """
     if not url or not isinstance(url, str):
         return None
     try:
@@ -28,7 +32,12 @@ def parse_edge_config(url):
     token = (parse_qs(p.query).get("token") or [""])[0]
     if not cfg_id or not token:
         return None
-    return cfg_id, token
+    return cfg_id, token, "https://" + p.netloc
+
+
+def _connection_string():
+    """Env подключения хранилища: старое имя EDGE_CONFIG или новое GLOBAL_CONFIG."""
+    return os.environ.get("EDGE_CONFIG") or os.environ.get("GLOBAL_CONFIG") or ""
 
 
 def validate_ca(raw):
@@ -50,11 +59,11 @@ def check_secret(supplied, expected):
 
 def read_ca():
     """Текущий CA из Edge Config; любая проблема -> None."""
-    parsed = parse_edge_config(os.environ.get("EDGE_CONFIG", ""))
+    parsed = parse_edge_config(_connection_string())
     if not parsed:
         return None
-    cfg_id, token = parsed
-    url = "https://edge-config.vercel.com/%s/item/ca?token=%s" % (cfg_id, token)
+    cfg_id, token, base = parsed
+    url = "%s/%s/item/ca?token=%s" % (base, cfg_id, token)
     try:
         with urllib.request.urlopen(url, timeout=4) as r:
             value = json.loads(r.read().decode())
@@ -67,11 +76,11 @@ def read_ca():
 
 def write_ca(value):
     """Upsert item 'ca' через Vercel API. -> (ok, err_text)."""
-    parsed = parse_edge_config(os.environ.get("EDGE_CONFIG", ""))
+    parsed = parse_edge_config(_connection_string())
     api_token = os.environ.get("VERCEL_API_TOKEN", "")
     if not parsed or not api_token:
         return False, "storage is not configured"
-    cfg_id, _ = parsed
+    cfg_id = parsed[0]
     url = "https://api.vercel.com/v1/edge-config/%s/items" % cfg_id
     team = os.environ.get("VERCEL_TEAM_ID", "")
     if team:

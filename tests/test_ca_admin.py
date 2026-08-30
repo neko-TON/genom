@@ -8,7 +8,12 @@ class TestParseEdgeConfig(unittest.TestCase):
     def test_ok(self):
         self.assertEqual(
             parse_edge_config("https://edge-config.vercel.com/ecfg_abc?token=tok1"),
-            ("ecfg_abc", "tok1"))
+            ("ecfg_abc", "tok1", "https://edge-config.vercel.com"))
+
+    def test_global_config_host(self):
+        self.assertEqual(
+            parse_edge_config("https://global-config.vercel.com/ecfg_xyz?token=t2"),
+            ("ecfg_xyz", "t2", "https://global-config.vercel.com"))
 
     def test_garbage(self):
         for bad in (None, "", "ftp://x/y?token=1",
