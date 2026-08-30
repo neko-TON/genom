@@ -221,6 +221,7 @@
   (function caLine() {
     var line = $("caLine"), val = $("caVal"), btn = $("caCopy");
     if (!line || !val || !btn) return;
+    if (/^(localhost|127\.|\[?::1)/.test(location.hostname)) return;
     var full = "";
     function render(v) {
       full = typeof v === "string" ? v : "";
