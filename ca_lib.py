@@ -74,8 +74,35 @@ def read_ca():
     return None
 
 
+def _patch_items(url, api_token, operation, value):
+    """Один PATCH-запрос items. -> (ok, http_code, detail)."""
+    body = json.dumps({"items": [
+        {"operation": operation, "key": "ca", "value": value}]}).encode()
+    req = urllib.request.Request(
+        url, data=body, method="PATCH",
+        headers={"Authorization": "Bearer " + api_token,
+                 "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=8) as r:
+            r.read()
+        return True, 200, ""
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            detail = e.read().decode()[:200]
+        except Exception:
+            pass
+        return False, e.code, detail
+    except Exception as exc:
+        return False, 0, "%r" % (exc,)
+
+
 def write_ca(value):
-    """Upsert item 'ca' через Vercel API. -> (ok, err_text)."""
+    """Запись item 'ca' через Vercel API. -> (ok, err_text).
+
+    Global Config не принимает upsert по несуществующему ключу (404 «Item
+    not found»), поэтому лесенка: upsert → create → update.
+    """
     parsed = parse_edge_config(_connection_string())
     api_token = os.environ.get("VERCEL_API_TOKEN", "")
     if not parsed or not api_token:
@@ -85,22 +112,12 @@ def write_ca(value):
     team = os.environ.get("VERCEL_TEAM_ID", "")
     if team:
         url += "?teamId=" + team
-    body = json.dumps({"items": [
-        {"operation": "upsert", "key": "ca", "value": value}]}).encode()
-    req = urllib.request.Request(
-        url, data=body, method="PATCH",
-        headers={"Authorization": "Bearer " + api_token,
-                 "Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(req, timeout=8) as r:
-            r.read()
-        return True, ""
-    except urllib.error.HTTPError as e:
-        detail = ""
-        try:
-            detail = e.read().decode()[:200]
-        except Exception:
-            pass
-        return False, "vercel api: %d %s" % (e.code, detail)
-    except Exception as exc:
-        return False, "vercel api: %r" % (exc,)
+    attempts = []
+    for op in ("upsert", "create", "update"):
+        ok, code, detail = _patch_items(url, api_token, op, value)
+        if ok:
+            return True, ""
+        attempts.append("%s->%d %s" % (op, code, detail))
+        if code == 0:
+            break
+    return False, "vercel api: " + "; ".join(attempts)[:300]
