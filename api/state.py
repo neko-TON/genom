@@ -31,7 +31,7 @@ def build_state(now=None):
     if remainder:
         sim.advance(remainder)
     state = sim.snapshot()
-    state["public"] = True
+    state["observer"] = True
     return state
 
 

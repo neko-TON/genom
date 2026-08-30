@@ -42,6 +42,7 @@
 
   function render(s) {
     state = s;
+    document.body.classList.toggle("observer", !!s.observer);
     var live = s.mode === "live";
     // мок-симуляция видна только на локальном (непубличном) узле
     var showSim = !live && !s.public;

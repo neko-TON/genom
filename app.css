@@ -279,3 +279,6 @@ a.act { text-decoration: none; display: inline-block; }
   .navlink { position: relative; }
   .navlink::after { content: ""; position: absolute; left: -6px; right: -6px; top: -11px; bottom: -11px; }
 }
+
+/* ---------- observer mode (Vercel): витрина без интерактива ---------- */
+body.observer button, body.observer select.ctl { display: none !important; }

@@ -25,8 +25,10 @@ class TestVercelState(unittest.TestCase):
         n = len(s1["epochs"])
         self.assertEqual(s2["epochs"][:n], s1["epochs"])
 
-    def test_public_flag(self):
-        self.assertTrue(build_state(GENESIS_TS + 60.0)["public"])
+    def test_observer_flag(self):
+        s = build_state(GENESIS_TS + 60.0)
+        self.assertTrue(s["observer"])
+        self.assertFalse(s["public"])
 
     def test_cap_and_speed(self):
         t0 = time.perf_counter()
