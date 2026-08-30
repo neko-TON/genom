@@ -314,9 +314,8 @@
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     function fit() {
-      var r = cv.getBoundingClientRect();
-      if (!r.width) return false;
-      var w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+      if (!cv.offsetWidth) return false;
+      var w = Math.round(cv.offsetWidth * dpr), h = Math.round(cv.offsetHeight * dpr);
       if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
       return true;
     }
