@@ -1,0 +1,9 @@
+docs/
+tests/
+venv/
+__pycache__/
+.claude/
+.superpowers/
+genom.json
+genom
+README.md
