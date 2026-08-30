@@ -305,6 +305,79 @@
     onScroll();
   })();
 
+  /* ============ rotating hero helix (canvas) ============ */
+  (function helixSpin() {
+    var cv = document.getElementById("dnaGhost");
+    if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext("2d");
+    var VW = 220, VH = 840, CX = 110, AMP = 56, HALVES = 8;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function fit() {
+      var r = cv.getBoundingClientRect();
+      if (!r.width) return false;
+      var w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+      if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+      return true;
+    }
+
+    function strandX(t, phase) { return CX + AMP * Math.sin(Math.PI * t + phase); }
+    function strandZ(t, phase) { return Math.cos(Math.PI * t + phase); }
+
+    function drawStrand(phase, sx, sy, front) {
+      var step = 1 / 14;
+      for (var t = 0; t < HALVES - 1e-6; t += step) {
+        var z = (strandZ(t, phase) + strandZ(t + step, phase)) / 2;
+        if ((z >= 0) !== front) continue;
+        ctx.beginPath();
+        ctx.moveTo(strandX(t, phase) * sx, t * (VH / HALVES) * sy);
+        ctx.lineTo(strandX(t + step, phase) * sx, (t + step) * (VH / HALVES) * sy);
+        ctx.globalAlpha = 0.35 + 0.6 * Math.max(z, 0);
+        ctx.lineWidth = (1.8 + 1.2 * Math.max(z, 0)) * sx;
+        ctx.stroke();
+      }
+    }
+
+    function draw(phase) {
+      if (!fit()) return;
+      var sx = cv.width / VW, sy = cv.height / VH;
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.strokeStyle = "#63f5a6";
+      ctx.lineCap = "round";
+      for (var h = 0; h < HALVES; h++) {
+        for (var i = 0; i < 3; i++) {
+          var t = h + 0.35 + 0.15 * i;
+          var x1 = strandX(t, phase), x2 = strandX(t, phase + Math.PI);
+          if (Math.abs(x1 - x2) < AMP * 0.9) continue;
+          ctx.beginPath();
+          ctx.moveTo(x1 * sx, t * (VH / HALVES) * sy);
+          ctx.lineTo(x2 * sx, t * (VH / HALVES) * sy);
+          ctx.globalAlpha = 0.45;
+          ctx.lineWidth = 1.6 * sx;
+          ctx.stroke();
+        }
+      }
+      drawStrand(0 + phase, sx, sy, false);
+      drawStrand(Math.PI + phase, sx, sy, false);
+      drawStrand(0 + phase, sx, sy, true);
+      drawStrand(Math.PI + phase, sx, sy, true);
+      ctx.globalAlpha = 1;
+    }
+
+    if (REDUCED) {
+      draw(0);
+      window.addEventListener("resize", function () { draw(0); }, { passive: true });
+      return;
+    }
+    var start = null;
+    function tick(ts) {
+      if (start === null) start = ts;
+      draw((ts - start) / 1000 * (Math.PI / 6));
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+
   /* ============ reveal ============ */
   var rvEls = document.querySelectorAll(".rv");
   if ("IntersectionObserver" in window && !REDUCED) {
