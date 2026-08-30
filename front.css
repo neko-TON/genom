@@ -91,8 +91,8 @@ section[id] { scroll-margin-top: 40px; }
 /* ---------- hero ---------- */
 .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; overflow: hidden; }
 .hero-ghost {
-  position: absolute; top: 2%; right: -2%; width: min(32vw, 400px);
-  color: var(--ice); opacity: .09; pointer-events: none;
+  position: absolute; top: -8%; right: -2%; width: min(26vw, 330px);
+  color: var(--ice); opacity: .16; pointer-events: none;
   transform: rotate(-28deg);
 }
 
