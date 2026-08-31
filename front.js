@@ -13,7 +13,7 @@
     var ctx = canvas.getContext("2d");
 
     var CFG = {
-      particleCount: window.innerWidth < 760 ? 320 : 700,
+      particleCount: window.innerWidth < 760 ? 160 : 350,
       speed: 0.2,
       flowStrength: 0.5,
       disperseStrength: 1,
@@ -172,49 +172,6 @@
         ticking = false;
       });
     }, { passive: true });
-  })();
-
-  /* ============ sequencer type-on for section titles ============ */
-  (function typeOn() {
-    if (REDUCED || !("IntersectionObserver" in window)) return;
-    var heads = document.querySelectorAll(".sec-head h2");
-    if (!heads.length) return;
-
-    function wrap(h2) {
-      var label = "";
-      Array.prototype.forEach.call(h2.childNodes, function (n) {
-        label += n.nodeType === 3 ? n.textContent : " ";
-      });
-      h2.setAttribute("aria-label", label.replace(/\s+/g, " ").trim());
-      var total = h2.textContent.length || 1;
-      var step = Math.min(40, 700 / total);
-      var idx = 0;
-      Array.prototype.slice.call(h2.childNodes).forEach(function (node) {
-        if (node.nodeType !== 3) return; /* keep <br> etc. */
-        var frag = document.createDocumentFragment();
-        node.textContent.split("").forEach(function (ch) {
-          if (ch === " ") { frag.appendChild(document.createTextNode(ch)); return; }
-          var s = document.createElement("span");
-          s.className = "tch";
-          s.textContent = ch;
-          s.style.animationDelay = Math.round(idx * step) + "ms";
-          idx += 1;
-          frag.appendChild(s);
-        });
-        h2.replaceChild(frag, node);
-      });
-      h2.classList.add("t-on");
-      setTimeout(function () { h2.classList.add("t-done"); }, Math.round(idx * step) + 600);
-    }
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        io.unobserve(e.target);
-        wrap(e.target);
-      });
-    }, { threshold: 0.4 });
-    Array.prototype.forEach.call(heads, function (h) { io.observe(h); });
   })();
 
   /* ============ contract address line ============ */
