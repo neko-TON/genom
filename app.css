@@ -13,7 +13,7 @@
   --good: #35e66b;
   --bad: #ff5a3c;
   --warn: #ffb84d;
-  --fd: "Unbounded", sans-serif;
+  --fd: "Libre Franklin", sans-serif;
   --ft: "Inter", sans-serif;
   --fm: "JetBrains Mono", monospace;
   --glow-g:  0 0 22px rgba(99, 245, 166, .24);
@@ -192,7 +192,7 @@ tr.sniper td { color: #d9a08f; }
 
 /* ---------- wallet ---------- */
 .w-stats { display: flex; gap: 26px; flex-wrap: wrap; margin-bottom: 14px; }
-.w-stats div b { display: block; font-family: var(--fd); font-weight: 500; font-size: 20px; color: var(--ice); }
+.w-stats div b { display: block; font-family: var(--fd); font-weight: 700; font-size: 20px; color: var(--ice); }
 .w-stats div span { font-size: 9.5px; color: var(--mute); letter-spacing: .12em; text-transform: uppercase; font-family: var(--fm); }
 .wallet-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch; }
 .amt {
@@ -225,7 +225,7 @@ a.act { text-decoration: none; display: inline-block; }
 
 /* ---------- treasury ---------- */
 .tr-run { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
-.tr-run b { font-family: var(--fd); font-weight: 600; font-size: 34px; color: var(--ice); }
+.tr-run b { font-family: var(--fd); font-weight: 700; font-size: 32px; letter-spacing: -.012em; color: var(--ice); }
 .tr-run span { color: var(--mute); font-size: 11px; }
 .kv { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-top: 1px solid var(--line); font-size: 12px; color: var(--dim); }
 .kv b { font-family: var(--fm); font-weight: 500; color: var(--ink); font-size: 11.5px; }

@@ -15,7 +15,7 @@
   --glow-g:  0 0 22px rgba(99, 245, 166, .24);
   --glow-gs: 0 0 14px rgba(99, 245, 166, .38);
   --glow-uv: 0 0 16px rgba(157, 123, 255, .40);
-  --fd: "Unbounded", sans-serif;
+  --fd: "Libre Franklin", sans-serif;
   --ft: "Inter", sans-serif;
   --fm: "JetBrains Mono", monospace;
 }
@@ -101,8 +101,8 @@ section[id] { scroll-margin-top: 40px; }
 .kick-badge { background: var(--ice); color: #04140b; padding: 5px 12px;
               letter-spacing: .18em; font-weight: 700; }
 .hero-in h1 {
-  font-family: var(--fd); font-weight: 600;
-  font-size: clamp(31px, 5vw, 66px); line-height: 1.1; letter-spacing: .01em;
+  font-family: var(--fd); font-weight: 800;
+  font-size: clamp(29px, 4.6vw, 60px); line-height: 1.1; letter-spacing: -.016em;
   color: var(--ice-b); margin-bottom: 42px;
 }
 .hero-in h1 span { display: block; }
@@ -163,8 +163,8 @@ section[id] { scroll-margin-top: 40px; }
   letter-spacing: .02em; transform: translateY(2px);
 }
 .sec-head h2 {
-  font-family: var(--fd); font-weight: 600; font-size: clamp(20px, 2.6vw, 34px);
-  line-height: 1.22; letter-spacing: .01em; color: var(--ice-b);
+  font-family: var(--fd); font-weight: 800; font-size: clamp(19px, 2.45vw, 32px);
+  line-height: 1.22; letter-spacing: -.012em; color: var(--ice-b);
 }
 
 .no { font-size: 13px; color: var(--mute); letter-spacing: .1em; padding-top: 4px; }
@@ -229,8 +229,8 @@ section[id] { scroll-margin-top: 40px; }
 /* final */
 .fin { padding: 160px 0 140px; }
 .fin h2 {
-  font-family: var(--fd); font-weight: 600;
-  font-size: clamp(24px, 3.6vw, 48px); line-height: 1.18; letter-spacing: .01em;
+  font-family: var(--fd); font-weight: 800;
+  font-size: clamp(23px, 3.35vw, 45px); line-height: 1.18; letter-spacing: -.014em;
   color: var(--ice-b); margin-bottom: 44px; max-width: 900px;
 }
 
@@ -400,7 +400,7 @@ section[id] { scroll-margin-top: 40px; }
   border: 1px solid var(--line-2); background: rgba(99, 245, 166, .03);
   padding: 16px 14px 18px; display: flex; flex-direction: column; gap: 12px;
 }
-.gene-val { font-family: var(--fd); font-weight: 600; font-size: 22px; color: var(--ink); }
+.gene-val { font-family: var(--fd); font-weight: 700; font-size: 22px; letter-spacing: -.01em; color: var(--ink); }
 .gene-lbl { font-size: 10px; letter-spacing: .12em; color: var(--dim); line-height: 1.55; }
 .gene-track { position: relative; height: 5px; background: rgba(99, 245, 166, .1); }
 .gene-track i { position: absolute; display: block; }
