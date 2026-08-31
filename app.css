@@ -63,9 +63,10 @@ a { color: inherit; text-decoration: none; }
 .ctl {
   border: 1px solid var(--line-2); padding: 6px 12px;
   font-family: var(--fm); font-size: 11px; letter-spacing: .08em; color: var(--ice);
-  background: rgba(2, 8, 4, .4); transition: background .2s, color .2s;
+  background: rgba(2, 8, 4, .4); transition: background .2s, color .2s, transform .1s;
 }
 .ctl:hover { background: rgba(99, 245, 166, .12); }
+.ctl:active { transform: translateY(1px); }
 .ctl-ice { background: var(--ice); color: #04140b; font-weight: 700; border-color: var(--ice); }
 .ctl-ice:hover { background: var(--ice-b); }
 select.ctl option { background: #0a2013; color: var(--ink); }
