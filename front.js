@@ -14,7 +14,7 @@
 
     var CFG = {
       particleCount: window.innerWidth < 760 ? 320 : 700,
-      speed: 0.4,
+      speed: 0.2,
       flowStrength: 0.5,
       disperseStrength: 1,
       idleDim: 0.65,
