@@ -127,7 +127,7 @@ section[id] { scroll-margin-top: 40px; }
 }
 .btn:hover { color: var(--ice-b); border-color: var(--ice-b); }
 .btn:active { transform: translateY(1px); }
-.lnk { font-family: var(--ft); font-size: 13px; color: var(--dim); border-bottom: 1px solid rgba(99, 245, 166, .2); padding-bottom: 2px; transition: color .2s, border-color .2s; }
+.lnk { font-family: var(--ft); font-size: 13px; color: var(--dim); border-bottom: 1px solid rgba(99, 245, 166, .45); padding-bottom: 2px; transition: color .2s, border-color .2s; }
 .lnk:hover { color: var(--ice); border-color: var(--ice); }
 
 /* ---------- data strip + tape ---------- */
@@ -347,7 +347,8 @@ section[id] { scroll-margin-top: 40px; }
 @media (max-width: 760px) {
   .lnk, .hd-console, .btn, #caCopy { position: relative; }
   .btn::after { content: ""; position: absolute; left: -6px; right: -6px; top: -10px; bottom: -10px; }
-  .lnk::after, .hd-console::after, #caCopy::after { content: ""; position: absolute; left: -8px; right: -8px; top: -15px; bottom: -15px; }
+  .lnk::after, .hd-console::after { content: ""; position: absolute; left: -8px; right: -8px; top: -15px; bottom: -15px; }
+  #caCopy::after { content: ""; position: absolute; left: -9px; right: -9px; top: -15px; bottom: -15px; }
 }
 
 /* ---------- CA line ---------- */
@@ -365,7 +366,9 @@ section[id] { scroll-margin-top: 40px; }
   color: var(--ice); background: none; border: 0;
   border-bottom: 1px solid rgba(99, 245, 166, .5);
   padding: 0 0 3px; cursor: pointer; transition: color .2s, border-color .2s, transform .1s;
+  text-transform: lowercase;
 }
+#caCopy::first-letter { text-transform: uppercase; }
 #caCopy:hover { color: var(--ice-b); border-color: var(--ice-b); }
 #caCopy:active { transform: translateY(1px); }
 @media (max-width: 760px) {
