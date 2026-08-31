@@ -122,9 +122,10 @@ section[id] { scroll-margin-top: 40px; }
 .btn {
   display: inline-block; font-size: 12px; letter-spacing: .14em; color: var(--ice);
   border: 1px solid var(--line-2); padding: 15px 26px; background: rgba(2,8,4,.4);
-  transition: background .2s, color .2s, border-color .2s;
+  transition: background .2s, color .2s, border-color .2s, transform .1s;
 }
 .btn:hover { background: var(--ice); color: #04140b; border-color: var(--ice); }
+.btn:active { transform: translateY(1px); }
 .lnk { font-size: 11px; letter-spacing: .14em; color: var(--mute); border-bottom: 1px solid var(--line); padding-bottom: 2px; transition: color .2s, border-color .2s; }
 .lnk:hover { color: var(--ice); border-color: var(--ice); }
 
@@ -360,9 +361,10 @@ section[id] { scroll-margin-top: 40px; }
 #caCopy {
   flex: none; font-family: var(--fm); font-size: 10px; letter-spacing: .14em;
   color: var(--ice); background: none; border: 1px solid var(--line-2);
-  padding: 6px 10px; cursor: pointer; transition: background .2s, color .2s;
+  padding: 6px 10px; cursor: pointer; transition: background .2s, color .2s, transform .1s;
 }
 #caCopy:hover { background: var(--ice); color: #04140b; }
+#caCopy:active { transform: translateY(1px); }
 @media (max-width: 760px) {
   .ca-line { display: flex; width: 100%; }
   .ca-line[hidden] { display: none; }
@@ -437,3 +439,7 @@ section[id] { scroll-margin-top: 40px; }
   .mech-grid .mcard.rv:nth-child(6) { --d: .35s; }
   .mech-grid .mcard.rv:nth-child(7) { --d: .42s; }
 }
+
+/* ---------- card micro-states ---------- */
+.gene, .mcard { transition: background .25s, border-color .25s; }
+.gene:hover, .mcard:hover { background: rgba(99, 245, 166, .06); border-color: rgba(99, 245, 166, .4); }
