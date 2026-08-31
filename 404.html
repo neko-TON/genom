@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Libre+Franklin:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Libre+Franklin:wght@700;800&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -27,12 +27,13 @@
   @keyframes blink { 50% { opacity: 0; } }
   .note { margin-top: 14px; font-size: 12px; letter-spacing: .06em; color: #637e6f; }
   .back {
-    display: inline-block; margin-top: 34px; padding: 14px 24px;
-    font-size: 11px; letter-spacing: .14em; color: #63f5a6; text-decoration: none;
-    border: 1px solid rgba(99, 245, 166, .26); background: rgba(2, 8, 4, .4);
-    transition: background .2s, color .2s, transform .1s;
+    display: inline-block; margin-top: 34px; padding: 10px 0 8px;
+    font-family: "Libre Franklin", sans-serif; font-weight: 700; font-size: 15px;
+    letter-spacing: -.006em; color: #63f5a6; text-decoration: none;
+    border: 0; border-bottom: 2px solid #63f5a6; background: none;
+    transition: color .2s, border-color .2s, transform .1s;
   }
-  .back:hover { background: #63f5a6; color: #04140b; }
+  .back:hover { color: #c9ffdf; border-color: #c9ffdf; }
   .back:active { transform: translateY(1px); }
 </style>
 </head>
@@ -41,7 +42,7 @@
   <p class="code">404</p>
   <p class="gene">GENE NOT FOUND<span class="caret"></span></p>
   <p class="note">This sequence does not exist in the genome.</p>
-  <a class="back" href="/">← BACK TO THE GENOME</a>
+  <a class="back" href="/">Back to the genome</a>
 </div>
 </body>
 </html>
