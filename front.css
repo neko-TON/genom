@@ -378,3 +378,219 @@ section[id] { scroll-margin-top: 76px; }
   .ph li { min-height: 94px; }
   .fin { padding: 68px 0; }
 }
+
+/* ---------- section 02 · public proof ---------- */
+#proof {
+  padding: 76px 0;
+}
+.proof-head {
+  margin-bottom: 30px;
+}
+.proof-kicker {
+  display: block;
+  margin-bottom: 10px;
+  color: #678600;
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+.proof-board {
+  grid-template-columns: minmax(0, 1.18fr) minmax(360px, .82fr);
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .12);
+}
+.proof-board .term {
+  display: flex;
+  flex-direction: column;
+  min-height: 440px;
+  padding: 26px;
+}
+.proof-board .term-hd {
+  align-items: center;
+  padding-bottom: 14px;
+}
+.term-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.term-live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--acid);
+  box-shadow: 0 0 0 4px rgba(200, 255, 0, .1);
+}
+.proof-board .term-bd {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding-top: 20px;
+  line-height: 1.55;
+}
+.term-code {
+  padding: 11px 13px;
+  border: 1px solid var(--line-dark);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .025);
+}
+.commit-epoch {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 10px;
+  align-items: baseline;
+  margin-top: 22px;
+}
+.commit-label {
+  color: var(--muted-dark);
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+.commit-epoch strong {
+  font-family: var(--serif);
+  font-size: 42px;
+  line-height: 1;
+}
+.commit-epoch .dim {
+  font-size: 11px;
+}
+.proof-board .hashline {
+  margin-top: 20px;
+  padding: 13px;
+  border: 1px dashed rgba(200, 255, 0, .38);
+  border-radius: 10px;
+  background: rgba(200, 255, 0, .035);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.commit-status {
+  margin-top: auto;
+  padding-top: 18px;
+}
+.proof-board .proof-side {
+  justify-content: flex-start;
+  padding: 26px;
+  background: #f4f3ed;
+  border-left: 1px solid var(--line-light);
+}
+.proof-copy {
+  max-width: 44ch;
+  color: var(--muted-light);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.proof-flow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 20px;
+  border: 1px solid var(--line-light);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.proof-flow div {
+  min-width: 0;
+  padding: 12px;
+  border-right: 1px solid var(--line-light);
+}
+.proof-flow div:last-child {
+  border-right: 0;
+}
+.proof-flow span,
+.proof-flow b {
+  display: block;
+}
+.proof-flow span {
+  margin-bottom: 7px;
+  color: #678600;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+.proof-flow b {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.15;
+}
+.proof-basket {
+  margin-top: 18px;
+  padding: 13px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line-light);
+}
+.proof-basket-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted-light);
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+.proof-board .mini {
+  gap: 5px;
+  margin-top: 10px;
+}
+.proof-board .mb-row {
+  grid-template-columns: 76px 1fr 42px;
+  gap: 8px;
+}
+.proof-board .proof-cta {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 18px;
+}
+@media (max-width: 900px) {
+  #proof {
+    padding: 62px 0;
+  }
+  .proof-board {
+    grid-template-columns: 1fr;
+  }
+  .proof-board .term {
+    min-height: 360px;
+  }
+  .proof-board .proof-side {
+    border-top: 1px solid var(--line-light);
+    border-left: 0;
+  }
+}
+@media (max-width: 620px) {
+  #proof {
+    padding: 52px 0;
+  }
+  .proof-head {
+    margin-bottom: 24px;
+  }
+  .proof-kicker {
+    font-size: 11px;
+  }
+  .proof-board .term,
+  .proof-board .proof-side {
+    padding: 20px;
+  }
+  .proof-board .term {
+    min-height: 340px;
+  }
+  .commit-epoch {
+    grid-template-columns: auto auto;
+  }
+  .commit-epoch .dim {
+    grid-column: 1 / -1;
+  }
+  .proof-flow {
+    grid-template-columns: 1fr;
+  }
+  .proof-flow div {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    align-items: center;
+    border-right: 0;
+    border-bottom: 1px solid var(--line-light);
+  }
+  .proof-flow div:last-child {
+    border-bottom: 0;
+  }
+  .proof-flow span {
+    margin-bottom: 0;
+  }
+}
