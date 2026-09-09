@@ -982,3 +982,57 @@ main > .fin {
     will-change: auto;
   }
 }
+
+/* ---------- concise modern hero ---------- */
+.hero {
+  min-height: 600px;
+}
+.pagebg {
+  height: 650px;
+}
+.hero-in {
+  grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr);
+  margin-bottom: 24px;
+}
+.hero h1 {
+  max-width: 640px;
+  font-family: var(--sans);
+  font-size: clamp(46px, 4.6vw, 66px);
+  font-weight: 600;
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+.hero h1 .hl {
+  color: var(--acid);
+}
+.hero-sub {
+  max-width: 475px;
+  font-size: 16px;
+  line-height: 1.56;
+}
+.hero-kicker {
+  letter-spacing: .09em;
+}
+@media (max-width: 900px) {
+  .hero {
+    min-height: 650px;
+  }
+  .pagebg {
+    height: 700px;
+  }
+  .hero h1 {
+    max-width: 700px;
+    font-size: clamp(44px, 9vw, 62px);
+  }
+}
+@media (max-width: 620px) {
+  .hero {
+    min-height: 610px;
+  }
+  .pagebg {
+    height: 660px;
+  }
+  .hero h1 {
+    font-size: clamp(38px, 11.5vw, 50px);
+  }
+}
