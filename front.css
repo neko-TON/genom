@@ -942,6 +942,7 @@ body {
   height: 710px;
   z-index: 0;
   opacity: .34;
+  transform: rotate(-28deg);
   transform-origin: center top;
   filter: drop-shadow(0 0 12px rgba(200,255,22,.055));
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 5%, #000 84%, transparent 100%);
