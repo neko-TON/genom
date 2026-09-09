@@ -812,3 +812,150 @@ table.h td {
 .card {
   contain: paint;
 }
+
+
+/* ---------- unified product console ---------- */
+:root {
+  --bg: #070907;
+  --panel: #0b0e0a;
+  --line: rgba(255,255,255,.105);
+  --line-2: rgba(191,243,59,.34);
+  --ice: #bff33b;
+  --ice-b: #fff;
+  --blue: #8b9187;
+  --dim: #b7bbb2;
+  --mute: #777d73;
+  --fd: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --ft: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --glow-g: none;
+  --glow-gs: none;
+  --glow-uv: none;
+}
+body {
+  background:
+    radial-gradient(ellipse at 72% -18%, rgba(191,243,59,.045), transparent 34%),
+    var(--bg);
+  letter-spacing: -.005em;
+}
+.top {
+  padding-top: 11px;
+  padding-bottom: 12px;
+  background: rgba(7,9,7,.95);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+}
+.wordmark {
+  letter-spacing: .07em;
+}
+.wordmark em {
+  color: #a7aca3;
+  text-transform: none;
+}
+.pill,
+.ctl,
+.act,
+.amt {
+  border-radius: 5px;
+}
+.pill {
+  background: transparent;
+}
+.navlink {
+  color: #a8ada4;
+  font-family: var(--ft);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.ctl {
+  font-family: var(--ft);
+  letter-spacing: 0;
+}
+.ctl-ice,
+.act-ice {
+  box-shadow: none;
+}
+.grid {
+  width: min(1240px, calc(100% - 48px));
+  gap: 10px;
+}
+.dash-layout,
+.dash-col,
+.dash-bottom {
+  gap: 10px;
+}
+.dash-bottom {
+  margin-top: 10px;
+}
+.grid > .card:not([hidden]) {
+  margin-bottom: 10px;
+}
+.card {
+  border-radius: 7px;
+  background: var(--panel);
+  box-shadow: none;
+}
+.card:hover {
+  border-color: rgba(255,255,255,.17);
+  background: var(--panel);
+}
+.card h2 {
+  font-family: var(--ft);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -.02em;
+  text-transform: none;
+}
+.card h2 .cn {
+  font-family: var(--fm);
+  color: #8fab31;
+  font-size: 10px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.card h2 .cn::after {
+  content: "";
+}
+.live-cell,
+.act-box {
+  border-radius: 5px;
+  background: rgba(255,255,255,.012);
+}
+.b-bar,
+.b-fill {
+  border-radius: 2px;
+}
+.t-item {
+  transition: border-color .15s ease;
+}
+.t-item:hover {
+  background: transparent;
+  border-top-color: rgba(191,243,59,.28);
+}
+.t-ep,
+.t-badge,
+.mode-tag,
+.alert button {
+  border-radius: 3px;
+}
+.legend {
+  color: #858b81;
+}
+.sw-shadow {
+  background: #8b9187;
+}
+.bottom {
+  padding-top: 18px;
+  padding-bottom: 18px;
+  color: #747a70;
+  letter-spacing: .03em;
+  text-transform: none;
+}
+@media (max-width: 620px) {
+  .grid {
+    width: calc(100% - 24px);
+  }
+  .card {
+    border-radius: 6px;
+  }
+}
