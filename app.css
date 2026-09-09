@@ -807,3 +807,8 @@ table.h td {
     grid-template-columns: 70px 1fr 70px;
   }
 }
+
+/* ---------- performance containment ---------- */
+.card {
+  contain: paint;
+}
