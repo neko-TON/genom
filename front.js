@@ -13,7 +13,7 @@
     var ctx = canvas.getContext("2d");
 
     var CFG = {
-      particleCount: window.innerWidth < 760 ? 160 : 350,
+      particleCount: window.innerWidth < 760 ? 80 : 180,
       speed: 0.2,
       flowStrength: 0.5,
       disperseStrength: 1,
@@ -68,11 +68,11 @@
     }
 
     var W = 0, H = 0;
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     var particles = [];
     var bright = 1, disperse = 0, drift = 0, flow = 0;
     var lastActivity = 0;
-    var running = false, rafId = null;
+    var running = false, rafId = null, lastFrame = 0, streamVisible = true;
 
     function resize() {
       W = Math.max(1, window.innerWidth);
@@ -141,17 +141,34 @@
       }
     }
 
-    function frame() {
+    function frame(ts) {
       if (!running) return;
       rafId = requestAnimationFrame(frame);
+      if (ts - lastFrame < 33) return;
+      lastFrame = ts;
       draw(false);
     }
     if (REDUCED) {
-      for (var s = 0; s < 26; s++) draw(true);
+      for (var s = 0; s < 18; s++) draw(true);
       return;
     }
-    function start() { if (!running) { running = true; frame(); } }
-    function stop() { running = false; if (rafId) cancelAnimationFrame(rafId); rafId = null; }
+    function start() {
+      if (!running && streamVisible && !document.hidden) {
+        running = true;
+        rafId = requestAnimationFrame(frame);
+      }
+    }
+    function stop() {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) {
+        streamVisible = entries[0].isIntersecting;
+        if (streamVisible) start(); else stop();
+      }, { rootMargin: "80px" }).observe(canvas);
+    }
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) stop(); else start();
     });
@@ -267,7 +284,7 @@
     if (!cv || !cv.getContext) return;
     var ctx = cv.getContext("2d");
     var VW = 280, VH = 900, CX = 140, AMP = 72, HALVES = 9;
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
     function fit() {
       if (!cv.offsetWidth) return false;
@@ -288,7 +305,7 @@
     }
 
     function drawStrand(phase, sx, sy, front) {
-      var step = 1 / 28;
+      var step = 1 / 22;
       for (var t = 0; t < HALVES - 1e-6; t += step) {
         var z = (strandZ(t, phase) + strandZ(t + step, phase)) / 2;
         if ((z >= 0) !== front) continue;
@@ -355,13 +372,31 @@
       return;
     }
 
-    var start = null;
+    var start = null, lastHelixFrame = 0, helixRaf = null, helixVisible = true;
     function tick(ts) {
+      if (!helixVisible || document.hidden) {
+        helixRaf = null;
+        return;
+      }
+      helixRaf = requestAnimationFrame(tick);
+      if (ts - lastHelixFrame < 33) return;
+      lastHelixFrame = ts;
       if (start === null) start = ts;
       draw((ts - start) / 1000 * (Math.PI / 9));
-      requestAnimationFrame(tick);
     }
-    requestAnimationFrame(tick);
+    function resumeHelix() {
+      if (!helixRaf && helixVisible && !document.hidden) {
+        helixRaf = requestAnimationFrame(tick);
+      }
+    }
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) {
+        helixVisible = entries[0].isIntersecting;
+        if (helixVisible) resumeHelix();
+      }, { rootMargin: "80px" }).observe(cv);
+    }
+    document.addEventListener("visibilitychange", resumeHelix);
+    resumeHelix();
   })();
 
   /* ============ reveal ============ */
@@ -538,6 +573,7 @@
   }
 
   function tick() {
+    if (document.hidden) return;
     fetch("/api/state").then(function (r) { return r.json(); }).then(function (s) {
       var noSimEarly = s.mode === "live" || s.public;
       if (!COUNTED && !noSimEarly && !REDUCED) {
@@ -571,5 +607,8 @@
     }).catch(function () { setState(false); });
   }
   tick();
-  setInterval(tick, 2000);
+  setInterval(tick, 5000);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) tick();
+  });
 })();
