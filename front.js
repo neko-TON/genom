@@ -168,7 +168,7 @@
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(function () {
-        ghost.style.transform = "translateY(" + (window.scrollY * 0.08) + "px) rotate(-28deg)";
+        ghost.style.transform = "translateY(" + (window.scrollY * 0.045) + "px)";
         ticking = false;
       });
     }, { passive: true });
@@ -266,55 +266,85 @@
     var cv = document.getElementById("dnaGhost");
     if (!cv || !cv.getContext) return;
     var ctx = cv.getContext("2d");
-    var VW = 220, VH = 840, CX = 110, AMP = 56, HALVES = 8;
+    var VW = 280, VH = 900, CX = 140, AMP = 72, HALVES = 9;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     function fit() {
       if (!cv.offsetWidth) return false;
-      var w = Math.round(cv.offsetWidth * dpr), h = Math.round(cv.offsetHeight * dpr);
-      if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+      var w = Math.round(cv.offsetWidth * dpr);
+      var h = Math.round(cv.offsetHeight * dpr);
+      if (cv.width !== w || cv.height !== h) {
+        cv.width = w;
+        cv.height = h;
+      }
       return true;
     }
 
-    function strandX(t, phase) { return CX + AMP * Math.sin(Math.PI * t + phase); }
-    function strandZ(t, phase) { return Math.cos(Math.PI * t + phase); }
+    function strandX(t, phase) {
+      return CX + AMP * Math.sin(Math.PI * t + phase);
+    }
+    function strandZ(t, phase) {
+      return Math.cos(Math.PI * t + phase);
+    }
 
     function drawStrand(phase, sx, sy, front) {
-      var step = 1 / 14;
+      var step = 1 / 28;
       for (var t = 0; t < HALVES - 1e-6; t += step) {
         var z = (strandZ(t, phase) + strandZ(t + step, phase)) / 2;
         if ((z >= 0) !== front) continue;
         ctx.beginPath();
         ctx.moveTo(strandX(t, phase) * sx, t * (VH / HALVES) * sy);
         ctx.lineTo(strandX(t + step, phase) * sx, (t + step) * (VH / HALVES) * sy);
-        ctx.globalAlpha = 0.35 + 0.6 * Math.max(z, 0);
-        ctx.lineWidth = (1.8 + 1.2 * Math.max(z, 0)) * sx;
+        ctx.globalAlpha = front ? 0.42 + 0.5 * Math.max(z, 0) : 0.16;
+        ctx.lineWidth = (front ? 2.1 : 1.25) * sx;
         ctx.stroke();
       }
     }
 
+    function drawNode(x, y, radius, alpha, sx) {
+      ctx.beginPath();
+      ctx.arc(x, y, radius * sx, 0, TAU);
+      ctx.globalAlpha = alpha;
+      ctx.fill();
+    }
+
     function draw(phase) {
       if (!fit()) return;
-      var sx = cv.width / VW, sy = cv.height / VH;
+      var sx = cv.width / VW;
+      var sy = cv.height / VH;
       ctx.clearRect(0, 0, cv.width, cv.height);
-      ctx.strokeStyle = "#63f5a6";
+
+      var stroke = ctx.createLinearGradient(0, 0, 0, cv.height);
+      stroke.addColorStop(0, "rgba(216,255,84,.96)");
+      stroke.addColorStop(.55, "rgba(200,255,22,.78)");
+      stroke.addColorStop(1, "rgba(112,155,0,.28)");
+      ctx.strokeStyle = stroke;
+      ctx.fillStyle = "#c8ff16";
       ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
       for (var h = 0; h < HALVES; h++) {
-        for (var i = 0; i < 3; i++) {
-          var t = h + 0.35 + 0.15 * i;
-          var x1 = strandX(t, phase), x2 = strandX(t, phase + Math.PI);
-          if (Math.abs(x1 - x2) < AMP * 0.9) continue;
+        for (var i = 0; i < 4; i++) {
+          var t = h + 0.2 + 0.19 * i;
+          var x1 = strandX(t, phase);
+          var x2 = strandX(t, phase + Math.PI);
+          var y = t * (VH / HALVES) * sy;
+          var depth = Math.abs(strandZ(t, phase));
+          if (Math.abs(x1 - x2) < AMP * 0.52) continue;
           ctx.beginPath();
-          ctx.moveTo(x1 * sx, t * (VH / HALVES) * sy);
-          ctx.lineTo(x2 * sx, t * (VH / HALVES) * sy);
-          ctx.globalAlpha = 0.45;
-          ctx.lineWidth = 1.6 * sx;
+          ctx.moveTo(x1 * sx, y);
+          ctx.lineTo(x2 * sx, y);
+          ctx.globalAlpha = 0.16 + depth * 0.24;
+          ctx.lineWidth = 1.05 * sx;
           ctx.stroke();
+          drawNode(x1 * sx, y, 1.35, 0.3 + depth * 0.28, sx);
+          drawNode(x2 * sx, y, 1.35, 0.3 + depth * 0.28, sx);
         }
       }
-      drawStrand(0 + phase, sx, sy, false);
+
+      drawStrand(phase, sx, sy, false);
       drawStrand(Math.PI + phase, sx, sy, false);
-      drawStrand(0 + phase, sx, sy, true);
+      drawStrand(phase, sx, sy, true);
       drawStrand(Math.PI + phase, sx, sy, true);
       ctx.globalAlpha = 1;
     }
@@ -324,10 +354,11 @@
       window.addEventListener("resize", function () { draw(0); }, { passive: true });
       return;
     }
+
     var start = null;
     function tick(ts) {
       if (start === null) start = ts;
-      draw((ts - start) / 1000 * (Math.PI / 6));
+      draw((ts - start) / 1000 * (Math.PI / 9));
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
