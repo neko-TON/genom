@@ -42,6 +42,7 @@
 
   function render(s) {
     state = s;
+    finishInitialPaint(s);
     document.body.classList.toggle("observer", !!s.observer);
     var live = s.mode === "live";
     // мок-симуляция видна только на локальном (непубличном) узле
@@ -886,6 +887,61 @@
     }, 8000);
   })();
 
+  /* ---------- instant first paint ---------- */
+  var CACHE_KEY = "genomConsoleState:v1";
+
+  function cacheState(s) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), state: s }));
+    } catch (e) {}
+  }
+
+  function cachedState() {
+    try {
+      var item = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+      if (item && item.state && Date.now() - item.at < 43200000) return item.state;
+    } catch (e) {}
+    return null;
+  }
+
+  function instantRows(count, widths) {
+    var out = '<div class="instant-list" aria-label="Loading current data">';
+    for (var i = 0; i < count; i++) {
+      out += '<div class="instant-row"><i style="width:' +
+        (widths && widths[i % widths.length] || 38) + '%"></i><b></b><span></span></div>';
+    }
+    return out + "</div>";
+  }
+
+  function setInitialControls(disabled) {
+    ["btnPause", "btnAdvance", "btnClaim"].forEach(function (id) {
+      var el = $(id); if (el) el.disabled = disabled;
+    });
+    document.querySelectorAll("[data-trade]").forEach(function (el) {
+      el.disabled = disabled;
+    });
+  }
+
+  function paintInitial() {
+    document.body.classList.add("loading");
+    setInitialControls(true);
+    $("topStats").innerHTML = '<span class="mode-tag sim">CONNECTING</span><span>loading current epoch</span>';
+    $("basket").innerHTML = instantRows(5, [24, 36, 29, 42, 31]);
+    $("track").innerHTML = instantRows(4, [32, 45, 28, 39]);
+    $("wallet").innerHTML = '<div class="instant-stats"><i></i><i></i><i></i></div>';
+    $("holders").innerHTML = instantRows(5, [40, 31, 48, 35, 43]);
+    $("guard").innerHTML = instantRows(4, [34, 46, 29, 40]);
+    $("treasury").innerHTML = instantRows(4, [38, 30, 44, 35]);
+    $("gov").innerHTML = instantRows(3, [42, 32, 47]);
+    $("log").innerHTML = instantRows(5, [48, 36, 43, 31, 39]);
+  }
+
+  function finishInitialPaint(s) {
+    document.body.classList.remove("loading", "load-error");
+    setInitialControls(false);
+    cacheState(s);
+  }
+
   /* ---------- poll ---------- */
   var reqSeq = 0;
   function refresh() {
@@ -894,6 +950,9 @@
       .then(function (s) { if (id === reqSeq) render(s); })
       .catch(function () {});
   }
+  var warmState = cachedState();
+  if (warmState) render(warmState);
+  else paintInitial();
   refresh();
   setInterval(refresh, 1200);
   window.addEventListener("resize", function () { if (state) render(state); });
