@@ -1,12 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#020804"/>
-  <g transform="translate(32 32) rotate(-42) scale(0.21) translate(-100 -113)">
-    <g stroke="#63F5A6" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <path d="M146 -4 C119 10 106 31 100 54 C52 89 52 137 100 172 C106 195 119 216 146 230"/>
-      <path d="M54 -4 C81 10 94 31 100 54 C148 89 148 137 100 172 C94 195 81 216 54 230"/>
-    </g>
-    <g stroke="#63F5A6" stroke-width="16" stroke-linecap="round" fill="none">
-      <path d="M84 88 L120 88"/><path d="M84 138 L116 138"/>
+  <rect width="64" height="64" rx="15" fill="#C8FF16"/>
+  <rect x=".75" y=".75" width="62.5" height="62.5" rx="14.25" fill="none" stroke="#060806" stroke-opacity=".18" stroke-width="1.5"/>
+  <g transform="rotate(-28 32 32)" fill="none" stroke="#060806" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 8 C22 15 42 15 42 22 C42 29 22 29 22 36 C22 43 42 43 42 56" stroke-width="4.5"/>
+    <path d="M42 8 C42 15 22 15 22 22 C22 29 42 29 42 36 C42 43 22 43 22 56" stroke-width="4.5"/>
+    <g stroke-width="2.25" stroke-opacity=".62">
+      <path d="M27 14 L37 14"/>
+      <path d="M22 22 L42 22"/>
+      <path d="M27 29 L37 29"/>
+      <path d="M22 36 L42 36"/>
+      <path d="M27 44 L37 44"/>
+      <path d="M26 51 L38 51"/>
     </g>
   </g>
 </svg>
