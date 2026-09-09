@@ -271,6 +271,87 @@
   </div>
 </section>
 
+
+<!-- ================= SYSTEM ATLAS ================= -->
+<section class="sec atlas-sec" id="system-map">
+  <div class="wrap">
+    <div class="atlas-head rv">
+      <div>
+        <span class="mono atlas-kicker">SYSTEM ATLAS · ILLUSTRATIVE EPOCH</span>
+        <h2>SEE WHAT THE AGENT SEES.</h2>
+      </div>
+      <p>A compact view of allocation, performance and authority — the three things that decide every epoch.</p>
+    </div>
+
+    <div class="atlas-grid">
+      <article class="atlas-card allocation-card rv">
+        <div class="atlas-card-head mono">
+          <span>BASKET COMPOSITION</span><span>VECTOR / 1522</span>
+        </div>
+        <div class="allocation-body">
+          <div class="alloc-ring" aria-label="Illustrative basket allocation: GOOGL 31%, NVDA 24%, TSM 18%, USDG 27%">
+            <div><strong>100%</strong><span class="mono">ALLOCATED</span></div>
+          </div>
+          <ul class="alloc-legend mono">
+            <li><i></i><span>GOOGL</span><b>31%</b></li>
+            <li><i></i><span>NVDA</span><b>24%</b></li>
+            <li><i></i><span>TSM</span><b>18%</b></li>
+            <li><i></i><span>USDG</span><b>27%</b></li>
+          </ul>
+        </div>
+        <p class="atlas-note">No position can cross the 35% contract cap.</p>
+      </article>
+
+      <article class="atlas-card curve-card rv d1">
+        <div class="atlas-card-head mono">
+          <span>REALIZED VS SHADOW</span><span>30 EPOCH WINDOW</span>
+        </div>
+        <div class="curve-stats mono">
+          <div><span>REALIZED</span><b>+8.4%</b></div>
+          <div><span>SHADOW</span><b>+5.1%</b></div>
+          <div><span>DELTA</span><b>+3.3%</b></div>
+        </div>
+        <svg class="atlas-chart" viewBox="0 0 640 210" role="img" aria-label="Illustrative comparison between realized and shadow unit value">
+          <g class="atlas-gridlines">
+            <path d="M0 25H640"/><path d="M0 80H640"/><path d="M0 135H640"/><path d="M0 190H640"/>
+          </g>
+          <path class="shadow-line" d="M8 170 C55 155 68 166 110 145 S178 151 220 128 S291 138 330 116 S392 124 430 96 S500 106 540 80 S595 86 632 62"/>
+          <path class="real-line" d="M8 174 C52 168 73 144 110 150 S176 122 220 130 S286 98 330 107 S389 76 430 88 S488 54 540 66 S592 37 632 42"/>
+          <circle class="chart-dot" cx="632" cy="42" r="5"/>
+        </svg>
+        <div class="curve-legend mono"><span><i></i>REALIZED</span><span><i></i>SHADOW</span></div>
+        <p class="atlas-note">Illustrative data. The live console labels simulated and on-chain states separately.</p>
+      </article>
+
+      <article class="atlas-card authority-card rv d2">
+        <div class="atlas-card-head mono">
+          <span>AUTHORITY MAP</span><span>WHO CAN DO WHAT</span>
+        </div>
+        <div class="authority-grid">
+          <div>
+            <span class="mono authority-id">A / AGENT</span>
+            <strong>Proposes</strong>
+            <p>Weights, thesis and execution vector.</p>
+            <small class="mono">NO WITHDRAWAL KEY</small>
+          </div>
+          <div>
+            <span class="mono authority-id">C / CONTRACT</span>
+            <strong>Enforces</strong>
+            <p>Caps, whitelist, turnover and slippage.</p>
+            <small class="mono">8 CHECKS · ATOMIC</small>
+          </div>
+          <div>
+            <span class="mono authority-id">H / HOLDERS</span>
+            <strong>Govern</strong>
+            <p>Rules, agent replacement and claims.</p>
+            <small class="mono">3-DAY TIMELOCK</small>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
 <!-- ================= DNA LIMITS ================= -->
 <section class="sec dna-sec">
   <div class="wrap">
