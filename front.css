@@ -635,3 +635,47 @@ section[id] { scroll-margin-top: 76px; }
     margin-bottom: 0;
   }
 }
+
+/* ---------- compact ticker marks ---------- */
+.tkr-ico {
+  width: 13px !important;
+  height: 13px !important;
+  max-width: 13px;
+  max-height: 13px;
+  flex: 0 0 13px;
+  vertical-align: middle;
+}
+.proof-board .mini {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 14px;
+}
+.proof-board .mb-row {
+  grid-template-columns: 72px minmax(48px, 1fr) 38px;
+  gap: 7px;
+  min-height: 22px;
+}
+.proof-board .mb-t {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.proof-board .tkr-ico {
+  width: 13px !important;
+  height: 13px !important;
+  max-width: 13px;
+  max-height: 13px;
+  flex-basis: 13px;
+  margin-right: 6px;
+}
+.proof-board .mb-w {
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 520px) {
+  .proof-board .mini {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .proof-board .mb-row {
+    grid-template-columns: 82px minmax(64px, 1fr) 42px;
+  }
+}
