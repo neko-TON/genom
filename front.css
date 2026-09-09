@@ -2,11 +2,11 @@
 
 :root {
   --bg: #020804;
-  --ink: #eafcef;
+  --ink: #fff;
   --dim: #93b8a3;
   --mute: #637e6f;
   --ice: #63f5a6;
-  --ice-b: #c9ffdf;
+  --ice-b: #fff;
   --blue: #9d7bff;
   --good: #35e66b;
   --bad: #ff5a3c;
@@ -186,7 +186,7 @@ section[id] { scroll-margin-top: 40px; }
 .term-bd { padding: 24px 20px 28px; font-size: 13px; line-height: 2.1; }
 .term-bd .dim { color: var(--mute); }
 .term-bd .ice { color: var(--ice); }
-.hashline { color: var(--ice); word-break: break-all; text-shadow: 0 0 16px rgba(99,245,166,.3); }
+.hashline { color: var(--ice); word-break: break-all; text-shadow: none; }
 .term-ok { color: var(--good); }
 .term-bad { color: var(--bad); }
 
@@ -360,7 +360,7 @@ section[id] { scroll-margin-top: 40px; }
 }
 .ca-line[hidden] { display: none; }
 .ca-line .ca-lbl { color: var(--mute); }
-#caVal { color: var(--ice); text-shadow: var(--glow-gs); overflow-wrap: anywhere; }
+#caVal { color: var(--ice); text-shadow: none; overflow-wrap: anywhere; }
 #caCopy {
   flex: none; font-family: var(--fd); font-weight: 600; font-size: 11px;
   color: var(--ice); background: none; border: 0;
