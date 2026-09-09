@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Genom Console — $GENOM local node</title>
+<title>Genom Console — $GENOM</title>
 <meta name="description" content="Live observer console of the Genom node: basket, NAV curve, sealed decisions and the mandate guard.">
 <meta name="theme-color" content="#020804">
 <meta property="og:type" content="website">
@@ -20,7 +20,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
@@ -41,15 +41,15 @@
           </g>
         </g>
       </svg>
-      <span class="wordmark">GENOM<em>CONSOLE</em></span>
+      <span class="wordmark">GENOM<em>Console</em></span>
     </a>
     <span class="pill mono">$GENOM</span>
-    <a href="index.html" class="navlink">front page</a>
+    <a href="index.html" class="navlink">Overview</a>
   </div>
 
   <div class="top-stats mono" id="topStats"></div>
 
-  <button id="btnWallet" class="ctl ctl-ice mono" hidden>LINK WALLET</button>
+  <button id="btnWallet" class="ctl ctl-ice mono" hidden>Connect wallet</button>
 
   <div class="top-ctl">
     <button id="btnPause" class="ctl" title="Halt / continue">⏸</button>
@@ -58,7 +58,7 @@
       <option value="60" selected>epoch = 60s</option>
       <option value="180">epoch = 180s</option>
     </select>
-    <button id="btnAdvance" class="ctl ctl-ice" title="Finish the epoch immediately">skip to next epoch →</button>
+    <button id="btnAdvance" class="ctl ctl-ice" title="Finish the epoch immediately">Next epoch</button>
   </div>
   <div class="epoch-line"><span id="epochProgress"></span></div>
 </header>
@@ -67,28 +67,28 @@
 
 <main class="grid">
   <section class="card col-12" id="cardLive" hidden>
-    <h2><span class="cn mono">on-chain</span> Contract currently attached <span class="mono lf-status ok" id="cfgStatus"></span></h2>
+    <h2><span class="cn mono">on-chain</span> Connected contract <span class="mono lf-status ok" id="cfgStatus"></span></h2>
     <div id="liveInfo"></div>
     <p class="foot mono">set up via the terminal: ./genom connect &lt;vault&gt; [rpc] · ./genom sim</p>
   </section>
 
   <section class="card col-12" id="cardOnWallet" hidden>
-    <h2><span class="cn mono">your wallet</span> Live balance & claiming</h2>
+    <h2><span class="cn mono">your wallet</span> Balance and claims</h2>
     <div id="onWallet" class="mono"></div>
   </section>
 
   <section class="card col-12" id="cardActions" hidden>
-    <h2><span class="cn mono">actions</span> Act on-chain — signed by the attached wallet</h2>
+    <h2><span class="cn mono">actions</span> On-chain actions</h2>
     <div class="act-grid">
       <div class="act-box">
         <p class="act-t mono">DEAL ON THE CURVE</p>
         <div class="act-row">
           <input id="buyEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="amount of ETH to spend">
-          <button class="act act-ice" id="btnBuy">spend ETH to buy</button>
+          <button class="act act-ice" id="btnBuy">Buy with ETH</button>
         </div>
         <div class="act-row">
           <input id="sellTok" class="amt mono" type="number" value="100000" step="10000" min="0" aria-label="how many tokens to sell">
-          <button class="act" id="btnSell">unload tokens</button>
+          <button class="act" id="btnSell">Sell tokens</button>
         </div>
         <p class="act-hint mono">buys and sells settle against the Pons bonding curve · 1% fee</p>
       </div>
@@ -96,11 +96,11 @@
         <p class="act-t mono">TOP UP THE GENOM VAULT</p>
         <div class="act-row">
           <input id="feedEth" class="amt mono" type="number" value="0.001" step="0.001" min="0" aria-label="amount of ETH to send">
-          <button class="act act-ice" id="btnFeed">push ETH fees in</button>
+          <button class="act act-ice" id="btnFeed">Add ETH fees</button>
         </div>
         <div class="act-row">
-          <button class="act" id="btnProcessWeth">process WETH → split</button>
-          <button class="act" id="btnBurn">torch a stray token</button>
+          <button class="act" id="btnProcessWeth">Process WETH split</button>
+          <button class="act" id="btnBurn">Remove unsupported token</button>
         </div>
         <p class="act-hint mono">ETH/WETH are split 80/13/7 · anything else is burned to the dead address</p>
       </div>
@@ -111,23 +111,23 @@
     <div class="dash-layout">
     <div class="dash-col dash-main">
 <section class="card col-7" id="cardBasket">
-    <h2><span class="cn mono">GenomVault</span> The basket</h2>
+    <h2><span class="cn mono">GenomVault</span> Portfolio</h2>
     <div id="basket"></div>
     <p class="foot mono" id="basketFoot"></p>
   </section>
 <section class="card col-7" id="cardTrack">
-    <h2><span class="cn mono">CommitStore</span> Track record · the hash arrives ahead of the swap · open any epoch for detail</h2>
+    <h2><span class="cn mono">CommitStore</span> Decision history</h2>
     <div id="track"></div>
   </section>
 <section class="card col-7" id="cardHolders">
-    <h2><span class="cn mono">weight × time</span> The holders</h2>
+    <h2><span class="cn mono">weight × time</span> Holder weight</h2>
     <div id="holders"></div>
   </section>
     </div>
 
     <div class="dash-col dash-side">
 <section class="card col-5" id="cardChart">
-    <h2><span class="cn mono">NAV</span> Unit value — realized vs shadow</h2>
+    <h2><span class="cn mono">NAV</span> Unit value</h2>
     <canvas id="chart" height="220"></canvas>
     <div class="legend mono">
       <span><i class="sw sw-fact"></i>realized (executed)</span>
@@ -135,7 +135,7 @@
     </div>
   </section>
 <section class="card col-5" id="cardWallet">
-    <h2><span class="cn mono">your wallet</span> Holdings & claiming</h2>
+    <h2><span class="cn mono">your wallet</span> Holdings and claims</h2>
     <div id="wallet"></div>
     <div class="wallet-btns">
       <input id="tradeAmt" class="amt mono" type="number" value="100000" min="0" step="10000" aria-label="$GENOM amount to trade">
@@ -146,7 +146,7 @@
     <p class="foot">There is no claiming timetable — anything accrued is yours to take at any time.</p>
   </section>
 <section class="card col-5" id="cardGuard">
-    <h2><span class="cn mono">MandateGuard</span> Most recent vector check</h2>
+    <h2><span class="cn mono">MandateGuard</span> Latest vector check</h2>
     <div id="guard"></div>
   </section>
     </div>
@@ -162,15 +162,14 @@
     <div id="gov"></div>
   </section>
 <section class="card col-4" id="cardLog">
-    <h2><span class="cn mono">activity</span> Node journal</h2>
+    <h2><span class="cn mono">activity</span> Activity</h2>
     <div id="log" class="mono"></div>
   </section>
   </div>
 </main>
 
 <footer class="bottom mono">
-  Genom Agent · a full-cycle local simulation of concept v0.1 · real keccak256 + abi.encode ·
-  this node emulates Robinhood Chain / Pons V2 / Uniswap V4
+  Genom Agent · Robinhood Chain · Pons V2 · Uniswap V4
 </footer>
 
 <script src="icons.js"></script>
