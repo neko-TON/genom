@@ -1903,3 +1903,49 @@ body { letter-spacing: -.01em; }
   }
   .fin .btn { width: 100%; }
 }
+
+
+/* ---------- authored motion media ---------- */
+.hero-media {
+  width: min(100%, 500px);
+  margin-top: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 7px;
+  background: #080a08;
+}
+.hero-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 720 / 320;
+}
+.hero-media figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 9px 12px;
+  border-top: 1px solid rgba(255,255,255,.1);
+  color: #858b81;
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+.hero-media figcaption span:first-child {
+  color: #bff33b;
+}
+@media (max-width: 900px) {
+  .hero-media {
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+@media (max-width: 620px) {
+  .hero-media {
+    margin-top: 18px;
+  }
+  .hero-media figcaption {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+}
