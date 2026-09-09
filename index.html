@@ -251,24 +251,52 @@
 <!-- ================= PROOF ================= -->
 <section class="sec" id="proof">
   <div class="wrap">
-    <div class="sec-head rv">
+    <div class="sec-head proof-head rv">
       <span class="mono sec-idx">02</span>
-      <h2>EVERYTHING HERE IS ALREADY<br>RUNNING ON THIS NODE</h2>
+      <div>
+        <span class="mono proof-kicker">PUBLIC PROOF · LIVE NODE</span>
+        <h2>EVERYTHING HERE IS ALREADY<br>RUNNING ON THIS NODE</h2>
+      </div>
     </div>
-    <div class="proof rv d1">
-      <div class="term mono">
-        <div class="term-hd"><span>COMMITSTORE</span><span>MOST RECENT SEALED DECISION</span></div>
+
+    <div class="proof proof-board rv d1">
+      <div class="term">
+        <div class="term-hd">
+          <span>COMMITSTORE</span>
+          <span class="term-live"><i></i> MOST RECENT SEALED DECISION</span>
+        </div>
         <div class="term-bd">
-          <p class="dim">commit = keccak256(abi.encode(epoch, weights, thesisText, nonce))</p>
-          <p>epoch <span class="ice" id="cEpoch">—</span> <span class="dim">/ filed ahead of execution</span></p>
+          <p class="term-code dim">commit = keccak256(abi.encode(epoch, weights, thesisText, nonce))</p>
+          <div class="commit-epoch">
+            <span class="mono commit-label">EPOCH</span>
+            <strong class="ice" id="cEpoch">—</strong>
+            <span class="dim">filed ahead of execution</span>
+          </div>
           <p class="hashline" id="cHash">0x————————————————————————————————————————————————————————————————</p>
-          <p class="dim" id="cStatus">linking to the node<span class="cursor">▌</span></p>
+          <p class="commit-status dim" id="cStatus">linking to the node<span class="cursor">▌</span></p>
         </div>
       </div>
+
       <div class="proof-side">
-        <p>In the console you can watch the basket rebalance, the guard throw out bad vectors, the sniper bot come away empty, the breaker, the votes — and trade and claim against it with a wallet of your own.</p>
-        <div class="mini mono" id="miniBasket"></div>
-        <a class="btn" href="console.html">Step into the console</a>
+        <p class="proof-copy">Watch each decision move from a sealed hash to a checked basket update. The console keeps the mandate, execution and holder outcome in one public trail.</p>
+
+        <div class="proof-flow" aria-label="How a decision becomes public proof">
+          <div><span class="mono">01 · SEALED</span><b>Hash arrives first</b></div>
+          <div><span class="mono">02 · CHECKED</span><b>Guard verifies limits</b></div>
+          <div><span class="mono">03 · VISIBLE</span><b>Result joins the record</b></div>
+        </div>
+
+        <div class="proof-basket">
+          <div class="proof-basket-head mono">
+            <span>LIVE BASKET</span>
+            <span>TOP WEIGHTS</span>
+          </div>
+          <div class="mini mono" id="miniBasket"></div>
+        </div>
+
+        <a class="btn proof-cta" href="console.html">
+          <span>Step into the console</span><span aria-hidden="true">↗</span>
+        </a>
       </div>
     </div>
   </div>
