@@ -381,41 +381,43 @@ section[id] { scroll-margin-top: 76px; }
 
 /* ---------- section 02 · public proof ---------- */
 #proof {
-  padding: 76px 0;
+  padding: 58px 0;
 }
 .proof-head {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 .proof-kicker {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: #678600;
   font-size: 12px;
   letter-spacing: .12em;
 }
 .proof-board {
-  grid-template-columns: minmax(0, 1.18fr) minmax(360px, .82fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(390px, .92fr);
   border-radius: 18px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, .12);
+  box-shadow: 0 20px 56px rgba(0, 0, 0, .1);
 }
 .proof-board .term {
   display: flex;
   flex-direction: column;
-  min-height: 440px;
-  padding: 26px;
+  min-height: 0;
+  padding: 24px;
 }
 .proof-board .term-hd {
   align-items: center;
-  padding-bottom: 14px;
+  padding-bottom: 13px;
+  font-size: 12px;
 }
 .term-live {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 .term-live i {
   width: 7px;
   height: 7px;
+  flex: none;
   border-radius: 50%;
   background: var(--acid);
   box-shadow: 0 0 0 4px rgba(200, 255, 0, .1);
@@ -424,71 +426,77 @@ section[id] { scroll-margin-top: 76px; }
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding-top: 20px;
+  padding-top: 18px;
+  font-size: 13px;
   line-height: 1.55;
 }
 .term-code {
-  padding: 11px 13px;
+  padding: 10px 12px;
+  overflow-wrap: anywhere;
   border: 1px solid var(--line-dark);
-  border-radius: 10px;
+  border-radius: 9px;
   background: rgba(255, 255, 255, .025);
 }
 .commit-epoch {
   display: grid;
   grid-template-columns: auto auto 1fr;
-  gap: 10px;
+  gap: 9px;
   align-items: baseline;
-  margin-top: 22px;
+  margin-top: 18px;
 }
 .commit-label {
   color: var(--muted-dark);
-  font-size: 10px;
-  letter-spacing: .12em;
+  font-size: 12px;
+  letter-spacing: .1em;
 }
 .commit-epoch strong {
+  color: var(--acid);
   font-family: var(--serif);
-  font-size: 42px;
+  font-size: 38px;
   line-height: 1;
 }
 .commit-epoch .dim {
-  font-size: 11px;
+  font-size: 12px;
 }
 .proof-board .hashline {
-  margin-top: 20px;
-  padding: 13px;
+  margin-top: 16px;
+  padding: 11px 12px;
+  overflow-wrap: anywhere;
   border: 1px dashed rgba(200, 255, 0, .38);
-  border-radius: 10px;
+  border-radius: 9px;
   background: rgba(200, 255, 0, .035);
-  font-size: 11px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.45;
 }
 .commit-status {
-  margin-top: auto;
-  padding-top: 18px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-dark);
+  font-size: 12px;
 }
 .proof-board .proof-side {
   justify-content: flex-start;
-  padding: 26px;
-  background: #f4f3ed;
+  padding: 24px;
   border-left: 1px solid var(--line-light);
+  background: #f4f3ed;
 }
 .proof-copy {
-  max-width: 44ch;
+  max-width: 48ch;
   color: var(--muted-light);
   font-size: 16px;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 .proof-flow {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  margin-top: 20px;
-  border: 1px solid var(--line-light);
-  border-radius: 12px;
+  margin-top: 16px;
   overflow: hidden;
+  border: 1px solid var(--line-light);
+  border-radius: 11px;
 }
 .proof-flow div {
   min-width: 0;
-  padding: 12px;
+  padding: 11px;
   border-right: 1px solid var(--line-light);
 }
 .proof-flow div:last-child {
@@ -499,10 +507,10 @@ section[id] { scroll-margin-top: 76px; }
   display: block;
 }
 .proof-flow span {
-  margin-bottom: 7px;
+  margin-bottom: 5px;
   color: #678600;
-  font-size: 9px;
-  letter-spacing: .08em;
+  font-size: 12px;
+  letter-spacing: .04em;
 }
 .proof-flow b {
   color: var(--ink);
@@ -511,43 +519,78 @@ section[id] { scroll-margin-top: 76px; }
   line-height: 1.15;
 }
 .proof-basket {
-  margin-top: 18px;
-  padding: 13px;
-  border-radius: 12px;
-  background: var(--paper);
+  margin-top: 14px;
+  padding: 12px;
   border: 1px solid var(--line-light);
+  border-radius: 11px;
+  background: var(--paper);
 }
 .proof-basket-head {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   color: var(--muted-light);
-  font-size: 9px;
-  letter-spacing: .1em;
+  font-size: 12px;
+  letter-spacing: .06em;
 }
 .proof-board .mini {
+  display: grid;
   gap: 5px;
-  margin-top: 10px;
+  margin-top: 9px;
 }
 .proof-board .mb-row {
-  grid-template-columns: 76px 1fr 42px;
+  display: grid;
+  grid-template-columns: 86px minmax(70px, 1fr) 42px;
   gap: 8px;
+  align-items: center;
+  min-height: 18px;
+}
+.proof-board .mb-t {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: var(--ink);
+  font-size: 12px;
+}
+.proof-board .tkr-ico {
+  display: block;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  margin-right: 7px;
+  color: var(--ink);
+}
+.proof-board .mb-bar {
+  height: 4px;
+  overflow: hidden;
+  background: rgba(16, 19, 13, .12);
+}
+.proof-board .mb-fill {
+  height: 100%;
+  min-width: 2px;
+  background: #6f9000;
+}
+.proof-board .mb-fill.cash {
+  background: var(--acid);
+}
+.proof-board .mb-w {
+  color: var(--muted-light);
+  font-size: 12px;
+  text-align: right;
 }
 .proof-board .proof-cta {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-top: 18px;
+  min-height: 42px;
+  margin-top: 14px;
 }
 @media (max-width: 900px) {
   #proof {
-    padding: 62px 0;
+    padding: 52px 0;
   }
   .proof-board {
     grid-template-columns: 1fr;
-  }
-  .proof-board .term {
-    min-height: 360px;
   }
   .proof-board .proof-side {
     border-top: 1px solid var(--line-light);
@@ -556,20 +599,18 @@ section[id] { scroll-margin-top: 76px; }
 }
 @media (max-width: 620px) {
   #proof {
-    padding: 52px 0;
+    padding: 44px 0;
   }
   .proof-head {
-    margin-bottom: 24px;
-  }
-  .proof-kicker {
-    font-size: 11px;
+    margin-bottom: 20px;
   }
   .proof-board .term,
   .proof-board .proof-side {
-    padding: 20px;
+    padding: 18px;
   }
-  .proof-board .term {
-    min-height: 340px;
+  .proof-board .term-hd {
+    align-items: flex-start;
+    font-size: 12px;
   }
   .commit-epoch {
     grid-template-columns: auto auto;
@@ -582,7 +623,7 @@ section[id] { scroll-margin-top: 76px; }
   }
   .proof-flow div {
     display: grid;
-    grid-template-columns: 92px 1fr;
+    grid-template-columns: 105px 1fr;
     align-items: center;
     border-right: 0;
     border-bottom: 1px solid var(--line-light);
