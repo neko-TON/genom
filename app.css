@@ -579,3 +579,85 @@ table.h th, table.h td { padding-top: 6px; padding-bottom: 6px; }
 .card { align-self: start; min-height: 0; }
 #cardChart canvas { display: block; width: 100%; height: 220px; }
 #cardTreasury, #cardGov, #cardLog { min-height: 0; }
+
+/* ---------- compact dashboard flow ---------- */
+.grid {
+  display: block;
+}
+.grid > .card:not([hidden]) {
+  width: 100%;
+  margin-bottom: 12px;
+}
+.dash-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.38fr) minmax(340px, .62fr);
+  gap: 12px;
+  align-items: start;
+}
+.dash-col {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  align-content: start;
+}
+.dash-bottom {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+  align-items: start;
+}
+.dash-col .card,
+.dash-bottom .card {
+  width: 100%;
+  min-width: 0;
+}
+.card h2 {
+  margin: -20px -20px 13px;
+  padding: 13px 20px 12px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+.card h2 .cn {
+  display: inline;
+  margin: 0;
+  flex: none;
+}
+#cardChart canvas {
+  height: 190px;
+}
+#cardChart .legend {
+  flex-wrap: wrap;
+  gap: 7px 16px;
+}
+.w-stats {
+  gap: 10px 20px;
+  margin-bottom: 10px;
+}
+.act-grid {
+  gap: 10px;
+}
+.act-box {
+  padding: 12px;
+}
+#log {
+  max-height: 185px;
+}
+@media (max-width: 900px) {
+  .dash-layout {
+    grid-template-columns: 1fr;
+  }
+  .dash-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 620px) {
+  .card h2 {
+    margin: -17px -15px 12px;
+    padding: 12px 15px 11px;
+  }
+  #cardChart canvas {
+    height: 170px;
+  }
+}
