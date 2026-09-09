@@ -371,6 +371,7 @@
   function setState(ok, s) {
     var el = $("stState");
     if (!el) return;
+    el.hidden = false;
     if (!ok) {
       el.className = "strip-state err";
       el.textContent = "NODE DOWN — START IT: python3 server.py";
@@ -383,8 +384,8 @@
       el.className = "strip-state sim";
       el.textContent = "ON STANDBY / GOING LIVE ON PONS V2";
     } else {
-      el.className = "strip-state sim";
-      el.textContent = "SIMULATED DATA / LOCAL NODE / CONCEPT V0.1";
+      el.textContent = "";
+      el.hidden = true;
     }
   }
 
