@@ -964,3 +964,20 @@ body {
     display: none;
   }
 }
+
+/* ---------- performance containment ---------- */
+main > .sec,
+main > .fin {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 620px;
+}
+.hero-ghost,
+#wave {
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-ghost,
+  #wave {
+    will-change: auto;
+  }
+}
