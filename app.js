@@ -368,7 +368,7 @@
 
   function drawChart(seriesA, seriesB) {
     var cv = $("chart");
-    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var dpr = Math.min(1.5, window.devicePixelRatio || 1);
     var W = cv.clientWidth || 400, H = 220;
     cv.width = W * dpr; cv.height = H * dpr;
     var ctx = cv.getContext("2d");
@@ -883,7 +883,7 @@
       window.ethereum.on("chainChanged", function () { refreshOnWallet(); });
     }
     setInterval(function () {
-      if (W3.account && state && state.mode === "live") refreshOnWallet();
+      if (!document.hidden && W3.account && state && state.mode === "live") refreshOnWallet();
     }, 8000);
   })();
 
@@ -945,6 +945,7 @@
   /* ---------- poll ---------- */
   var reqSeq = 0;
   function refresh() {
+    if (document.hidden) return;
     var id = ++reqSeq;
     fetch("/api/state").then(function (r) { return r.json(); })
       .then(function (s) { if (id === reqSeq) render(s); })
@@ -954,6 +955,13 @@
   if (warmState) render(warmState);
   else paintInitial();
   refresh();
-  setInterval(refresh, 1200);
-  window.addEventListener("resize", function () { if (state) render(state); });
+  setInterval(refresh, 2500);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) refresh();
+  });
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () { if (state) render(state); }, 120);
+  });
 })();
