@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" role="img" aria-labelledby="title desc">
+<title id="title">GENOM protocol loop</title>
+<desc id="desc">Animated diagram showing trade tax moving through the vault, mandate guard and basket.</desc>
+<style>
+  text{font-family:"Helvetica Neue",Arial,sans-serif}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:1.3px}
+  .label{fill:#858b81;font-size:11px}
+  .title{fill:#fff;font-size:15px;font-weight:500}
+  .value{fill:#fff;font-size:27px;font-weight:500;letter-spacing:-1px}
+  .acid{fill:#bff33b}.line{fill:none;stroke:#343a32;stroke-width:1.5}
+  .route{fill:none;stroke:#bff33b;stroke-width:1.5;stroke-dasharray:4 7;opacity:.72}
+  .panel{fill:#0b0e0a;stroke:#2c312a}.soft{fill:#151a13}.muted{fill:#737970}
+  .packet{fill:#bff33b}
+  .scan{fill:#bff33b;opacity:.08}
+  .bar{fill:#bff33b}.bar2{fill:#789b25}.bar3{fill:#3c4d1e}
+  @media (prefers-reduced-motion:reduce){.moving{display:none}}
+</style>
+<rect width="720" height="320" rx="8" fill="#080a08"/>
+<path d="M0 54H720M0 275H720" stroke="#252a23"/>
+<text x="24" y="32" class="label mono">GENOM / PROTOCOL FLOW</text>
+<circle cx="580" cy="28" r="3.5" class="acid"/>
+<text x="592" y="32" class="label mono">ONE ATOMIC LOOP</text>
+
+<rect x="24" y="82" width="145" height="158" rx="5" class="panel"/>
+<text x="42" y="106" class="label mono">01 / TRADES</text>
+<text x="42" y="151" class="value">3.00%</text>
+<text x="42" y="171" class="label mono">TAX CAPTURED</text>
+<path d="M42 204H151" class="line"/>
+<rect x="42" y="203" width="87" height="2" class="bar"/>
+<text x="42" y="224" class="label">continuous inflow</text>
+
+<rect x="207" y="82" width="145" height="158" rx="5" class="panel"/>
+<text x="225" y="106" class="label mono">02 / VAULT</text>
+<text x="225" y="151" class="value">80%</text>
+<text x="225" y="171" class="label mono">TO THE BASKET</text>
+<rect x="225" y="197" width="109" height="5" class="soft"/>
+<rect x="225" y="197" width="87" height="5" class="bar"/>
+<text x="225" y="224" class="label">proposal sealed first</text>
+
+<rect x="390" y="82" width="145" height="158" rx="5" class="panel"/>
+<text x="408" y="106" class="label mono">03 / GUARD</text>
+<g class="mono" font-size="10">
+  <text x="408" y="140" class="label">WEIGHT CAP</text><text x="499" y="140" class="acid">PASS</text>
+  <text x="408" y="163" class="label">TURNOVER</text><text x="499" y="163" class="acid">PASS</text>
+  <text x="408" y="186" class="label">WHITELIST</text><text x="499" y="186" class="acid">PASS</text>
+</g>
+<rect x="402" y="112" width="121" height="22" class="scan moving">
+  <animate attributeName="y" values="112;198;112" dur="3.8s" repeatCount="indefinite"/>
+</rect>
+<text x="408" y="224" class="label">8 / 8 checks required</text>
+
+<rect x="573" y="82" width="123" height="158" rx="5" class="panel"/>
+<text x="591" y="106" class="label mono">04 / BASKET</text>
+<g transform="translate(591 129)">
+  <rect width="87" height="7" class="soft"/><rect width="67" height="7" class="bar">
+    <animate class="moving" attributeName="width" values="58;67;63;67" dur="5s" repeatCount="indefinite"/>
+  </rect>
+  <rect y="20" width="87" height="7" class="soft"/><rect y="20" width="51" height="7" class="bar2"/>
+  <rect y="40" width="87" height="7" class="soft"/><rect y="40" width="39" height="7" class="bar3"/>
+  <rect y="60" width="87" height="7" class="soft"/><rect y="60" width="57" height="7" class="muted"/>
+</g>
+<text x="591" y="224" class="label">allocation updated</text>
+
+<path id="route" d="M169 161H207M352 161H390M535 161H573" class="route"/>
+<g class="moving">
+  <circle r="4" class="packet"><animateMotion dur="3.6s" repeatCount="indefinite" path="M169 161H573"/></circle>
+  <circle r="3" class="packet" opacity=".55"><animateMotion begin="-1.2s" dur="3.6s" repeatCount="indefinite" path="M169 161H573"/></circle>
+</g>
+
+<text x="24" y="300" class="label mono">INFLOW</text>
+<text x="226" y="300" class="label mono">SEALED PROPOSAL</text>
+<text x="453" y="300" class="label mono">CONTRACT CHECK</text>
+<text x="625" y="300" class="label mono">EXECUTE</text>
+</svg>
