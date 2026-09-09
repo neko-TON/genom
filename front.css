@@ -154,7 +154,6 @@ section[id] { scroll-margin-top: 76px; }
 .mech-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line-light); border-radius: 22px; overflow: hidden; }
 .mcard { min-height: 210px; padding: 34px; border-right: 1px solid var(--line-light); border-bottom: 1px solid var(--line-light); background: transparent; }
 .mcard:nth-child(3n) { border-right: 0; }
-.mcard:nth-last-child(-n+3) { border-bottom: 0; }
 .mcard:last-child { grid-column: span 3; min-height: 155px; }
 .mc-tag { display: block; margin-bottom: 32px; color: #678600; font-size: 13px; font-weight: 700; letter-spacing: .08em; }
 .mcard b { display: block; margin-bottom: 10px; color: var(--ink); font-family: var(--serif); font-size: 23px; line-height: 1.15; }
@@ -237,7 +236,6 @@ section[id] { scroll-margin-top: 76px; }
   .mech-grid { grid-template-columns: repeat(2, 1fr); }
   .mcard:nth-child(3n) { border-right: 1px solid var(--line-light); }
   .mcard:nth-child(2n) { border-right: 0; }
-  .mcard:nth-last-child(-n+3) { border-bottom: 1px solid var(--line-light); }
   .mcard:last-child { grid-column: span 2; border-bottom: 0; }
   .gene-grid { grid-template-columns: repeat(2, 1fr); }
   .gene { border-bottom: 1px solid var(--line-dark); }
