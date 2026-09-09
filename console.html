@@ -108,13 +108,25 @@
     <p id="actStatus" class="mono act-status"></p>
   </section>
 
-  <section class="card col-7" id="cardBasket">
+    <div class="dash-layout">
+    <div class="dash-col dash-main">
+<section class="card col-7" id="cardBasket">
     <h2><span class="cn mono">GenomVault</span> The basket</h2>
     <div id="basket"></div>
     <p class="foot mono" id="basketFoot"></p>
   </section>
+<section class="card col-7" id="cardTrack">
+    <h2><span class="cn mono">CommitStore</span> Track record · the hash arrives ahead of the swap · open any epoch for detail</h2>
+    <div id="track"></div>
+  </section>
+<section class="card col-7" id="cardHolders">
+    <h2><span class="cn mono">weight × time</span> The holders</h2>
+    <div id="holders"></div>
+  </section>
+    </div>
 
-  <section class="card col-5" id="cardChart">
+    <div class="dash-col dash-side">
+<section class="card col-5" id="cardChart">
     <h2><span class="cn mono">NAV</span> Unit value — realized vs shadow</h2>
     <canvas id="chart" height="220"></canvas>
     <div class="legend mono">
@@ -122,13 +134,7 @@
       <span><i class="sw sw-shadow"></i>the agent's shadow (never executed)</span>
     </div>
   </section>
-
-  <section class="card col-7" id="cardTrack">
-    <h2><span class="cn mono">CommitStore</span> Track record · the hash arrives ahead of the swap · open any epoch for detail</h2>
-    <div id="track"></div>
-  </section>
-
-  <section class="card col-5" id="cardWallet">
+<section class="card col-5" id="cardWallet">
     <h2><span class="cn mono">your wallet</span> Holdings & claiming</h2>
     <div id="wallet"></div>
     <div class="wallet-btns">
@@ -139,31 +145,27 @@
     </div>
     <p class="foot">There is no claiming timetable — anything accrued is yours to take at any time.</p>
   </section>
-
-  <section class="card col-7" id="cardHolders">
-    <h2><span class="cn mono">weight × time</span> The holders</h2>
-    <div id="holders"></div>
-  </section>
-
-  <section class="card col-5" id="cardGuard">
+<section class="card col-5" id="cardGuard">
     <h2><span class="cn mono">MandateGuard</span> Most recent vector check</h2>
     <div id="guard"></div>
   </section>
+    </div>
+  </div>
 
-  <section class="card col-4" id="cardTreasury">
+  <div class="dash-bottom">
+<section class="card col-4" id="cardTreasury">
     <h2><span class="cn mono">AgentTreasury</span> Operating budget</h2>
     <div id="treasury"></div>
   </section>
-
-  <section class="card col-4" id="cardGov">
+<section class="card col-4" id="cardGov">
     <h2><span class="cn mono">vote · 3-day timelock</span> Governance</h2>
     <div id="gov"></div>
   </section>
-
-  <section class="card col-4" id="cardLog">
+<section class="card col-4" id="cardLog">
     <h2><span class="cn mono">activity</span> Node journal</h2>
     <div id="log" class="mono"></div>
   </section>
+  </div>
 </main>
 
 <footer class="bottom mono">
