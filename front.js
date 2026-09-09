@@ -168,7 +168,7 @@
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(function () {
-        ghost.style.transform = "translateY(" + (window.scrollY * 0.045) + "px) rotate(-11deg)";
+        ghost.style.transform = "translateY(" + (window.scrollY * 0.045) + "px) rotate(-28deg)";
         ticking = false;
       });
     }, { passive: true });
