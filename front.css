@@ -15,8 +15,8 @@
   --good: #8fe82a;
   --bad: #ff654a;
   --warn: #ffbf4b;
-  --serif: Georgia, "Times New Roman", serif;
-  --sans: "Inter", Arial, sans-serif;
+  --serif: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --sans: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
   --mono: "JetBrains Mono", monospace;
 }
 
