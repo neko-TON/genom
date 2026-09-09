@@ -1639,3 +1639,115 @@ main > .fin {
     stroke-dashoffset: 0;
   }
 }
+
+
+/* ---------- atmospheric protocol background ---------- */
+.pagebg {
+  height: 650px;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 76% 16%, rgba(200,255,22,.14) 0, rgba(134,174,18,.055) 28%, transparent 56%),
+    radial-gradient(ellipse at 20% 42%, rgba(107,139,20,.09) 0, transparent 44%),
+    linear-gradient(118deg, #050704 0%, #090d07 48%, #030503 100%);
+}
+.pagebg::before,
+.pagebg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.pagebg::before {
+  z-index: 1;
+  opacity: .32;
+  background:
+    linear-gradient(rgba(200,255,22,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,255,22,.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse at 72% 28%, #000 0, transparent 68%);
+  mask-image: radial-gradient(ellipse at 72% 28%, #000 0, transparent 68%);
+}
+.pagebg::after {
+  z-index: 2;
+  inset: -18%;
+  opacity: .72;
+  background:
+    repeating-radial-gradient(
+      ellipse at 76% 34%,
+      transparent 0 48px,
+      rgba(200,255,22,.035) 49px 50px,
+      transparent 51px 88px
+    ),
+    conic-gradient(
+      from 216deg at 72% 28%,
+      transparent 0 25%,
+      rgba(200,255,22,.065) 31%,
+      transparent 38% 100%
+    );
+  filter: blur(.2px);
+  transform: rotate(-5deg);
+}
+.pg-vig {
+  z-index: 3;
+  background:
+    linear-gradient(180deg, rgba(4,6,4,.05), rgba(5,7,4,.16) 58%, var(--black) 100%),
+    radial-gradient(ellipse at 72% 30%, transparent 0 20%, rgba(5,7,4,.22) 70%);
+}
+#wave {
+  z-index: 2;
+  opacity: .11;
+  mix-blend-mode: screen;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 62px 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(110deg, transparent 22%, rgba(200,255,22,.025) 50%, transparent 72%),
+    radial-gradient(circle at 78% 36%, rgba(200,255,22,.07), transparent 22%);
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  top: 105px;
+  right: max(24px, calc((100vw - 1180px) / 2));
+  z-index: -1;
+  width: min(42vw, 510px);
+  height: 330px;
+  pointer-events: none;
+  opacity: .45;
+  background-image: radial-gradient(circle, rgba(216,255,84,.38) 0 1px, transparent 1.5px);
+  background-size: 20px 20px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0, transparent 72%);
+  mask-image: radial-gradient(ellipse at center, #000 0, transparent 72%);
+  transform: perspective(560px) rotateY(-18deg) rotateZ(-5deg);
+  transform-origin: right center;
+}
+.hero-in,
+.hero .strip {
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 900px) {
+  .pagebg { height: 700px; }
+  .hero::after {
+    top: 90px;
+    right: -80px;
+    width: 420px;
+    opacity: .28;
+  }
+}
+@media (max-width: 620px) {
+  .pagebg { height: 660px; }
+  .pagebg::before { background-size: 48px 48px; }
+  .pagebg::after { opacity: .5; }
+  .hero::after {
+    top: 78px;
+    right: -170px;
+    width: 360px;
+    height: 280px;
+    opacity: .22;
+  }
+}
